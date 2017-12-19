@@ -1,0 +1,47 @@
+{
+  "name": "zoapp-backend",
+  "version": "0.7.5",
+  "description": "Zoapp Backend",
+  "main": "index.js",
+  "author": "Mik BRY <mik@zoapp.com>",
+  "license": "MIT",
+  "scripts": {
+    "clean-dist": "rm -r -f dist && mkdir dist",
+    "build": "yarn clean-dist && babel src -s -D -d dist && cp -f ./package.json ./dist/package.json && cp -f ./LICENSE ./dist/LICENSE && cp -f ./README.md ./dist/README.md",
+    "build:dev": "yarn build",
+    "build:prod": "yarn build && rm -r -f ./dist/config.j* && rm -r -f ./dist/index.j* && mv ./dist/zoapp.js ./dist/index.js",
+    "start:dev": "nodemon -w src --exec \"babel-node src \"",
+    "start:prod": "node dist",
+    "lint:prod": "eslint src",
+    "lint:dev": "eslint src --rule 'no-console: off' --fix",
+    "test": "eslint test --rule 'no-console: off' --fix && ./node_modules/.bin/mocha --compilers js:babel-core/register --exit"
+  },
+  "keywords": [
+    "Node",
+    "ES7",
+    "OAuth2"
+  ],
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "localtunnel": "1.8.3",
+    "ws": "^3.3.3",
+    "zoapp-core": "0.2.4",
+    "zoauth-server": "0.2.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.3",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2016": "^6.24.1",
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
+    "eslint": "^4.13.1",
+    "eslint-config-airbnb-base": "12.1.0",
+    "eslint-plugin-import": "2.8.0",
+    "mocha": "^4.0.1",
+    "nodemon": "^1.13.3"
+  }
+}
