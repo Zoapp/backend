@@ -5,3 +5,4 @@ lib
 config
 *config.js
 src/config.js
+yarn.lock

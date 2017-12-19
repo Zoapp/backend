@@ -5,6 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 import Zoapp from "./zoapp";
+import Config from "./config";
 
-const app = Zoapp();
-app.start();
+Zoapp(Config()).start();
