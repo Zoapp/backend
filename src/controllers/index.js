@@ -68,7 +68,7 @@ class MainController {
       redirect_uri: "localhost",
       scope: sc,
     });
-    console.log("authorize", user, payload);
+
     if (payload.result.redirect_uri === "localhost") {
       return sc;
     }

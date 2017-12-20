@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import AbstractModel from "./abstractModel";
-import descriptor from "../config/users.json";
+import descriptor from "../schemas/users.json";
 
 export default class extends AbstractModel {
   constructor(database, config) {

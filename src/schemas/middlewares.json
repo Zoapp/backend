@@ -1,0 +1,72 @@
+{
+  "title": "middlewares",
+  "description": "JSON schema for Zoapp's Middleware description collections",
+	"$schema": "http://json-schema.org/draft-06/schema#",
+	"type": "object",
+  "definitions": {
+    "Id": {
+      "type": "string"
+    },
+    "DateTime": {
+      "type": "string"
+    },
+    "Timestamp": {
+      "type": "integer"
+    },
+    "Link": {
+      "type": "string"
+    },
+    "Map": {
+      "type": "object"
+    }
+  },
+  "properties": {
+        "middlewares": {
+            "title": "Middlewares",
+            "properties": {
+                "id": {
+                    "type": "#Id"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "clientDirectory": {
+                    "type": "string"
+                },
+                "serverDirectory": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "classes": {
+                    "type": "array"
+                },
+                "origin": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "extras": {
+                    "type": "object"
+                },
+                "creation_date": {
+                    "type": "#DateTime"
+                } 
+            }
+        }
+    }
+}

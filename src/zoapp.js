@@ -6,6 +6,9 @@
  */
 import ApiServer from "./server";
 import App from "./app";
+import Controller from "./controllers/abstractController";
+import Model from "./models/abstractModel";
+import CommonRoutes from "./routes/common";
 
 const Zoapp = (config) => {
   const server = ApiServer(config);
@@ -26,5 +29,6 @@ const Zoapp = (config) => {
   return app;
 };
 
+export { Controller, Model, CommonRoutes };
 export default Zoapp;
 

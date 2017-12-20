@@ -33,6 +33,6 @@ export default class {
   }
 
   dispatch(className, data, originId = null) {
-    this.main.getMiddlewares().dispatchEvent(className, data, originId);
+    this.context.controllers.getMiddlewares().dispatchEvent(className, data, originId);
   }
 }
