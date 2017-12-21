@@ -22,6 +22,18 @@ export class WSRouter {
       that.startClient(ws, req).then();
     });
 
+    this.wss.on("error", (error) => {
+      console.log("Error caught: ");
+      console.log(error.stack);
+      // that.close();
+      // TODO restart
+    });
+
+    this.wss.on("end", (code, reason) => {
+      console.log("Connection Lost", code, reason);
+      // that.close();
+    });
+
     this.wsInterval = setInterval(() => {
       this.wss.clients.forEach((ws) => {
         if (ws.isAlive === false) {
@@ -33,6 +45,10 @@ export class WSRouter {
         }
       });
     }, 30000);
+  }
+
+  stop() {
+    this.close();
   }
 
   close() {
@@ -103,6 +119,16 @@ export class WSRouter {
         }
       }
     });
+    ws.on("error", (error) => {
+      console.log("Error caught: ");
+      console.log(error.stack);
+      WSRouter.closeClient(ws);
+    });
+
+    ws.on("end", (code, reason) => {
+      console.log("Connection Lost", code, reason);
+      WSRouter.closeClient(ws);
+    });
     const response = { event: "connected" };
     ws.send(JSON.stringify(response));
   }
@@ -130,9 +156,11 @@ export class WSRouter {
   }
 
   static closeClient(ws) {
-    ws.route = null;
-    ws.channelId = null;
-    ws.terminate();
+    if (ws.route) {
+      ws.route = null;
+      ws.channelId = null;
+      ws.terminate();
+    }
   }
 
   on(path, scope, classes, event, callback) {

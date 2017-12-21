@@ -123,6 +123,9 @@ class App {
 
   async close() {
     console.log(`Stop ${this.name}`);
+    if (this.wsRouter) {
+      await this.wsRouter.stop();
+    }
     if (this.server) {
       await this.server.stop(this);
     }
