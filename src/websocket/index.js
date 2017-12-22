@@ -35,9 +35,10 @@ export class WSRouter {
     });
 
     this.wsInterval = setInterval(() => {
-      this.wss.clients.forEach((ws) => {
+      const clients = [...this.wss.clients];
+      clients.forEach((ws) => {
         if (ws.isAlive === false) {
-          WSRouter.closeClient(ws);
+          this.closeClient(ws);
         } else {
           ws.isAlive = false;
           // console.log("ping");
@@ -48,17 +49,38 @@ export class WSRouter {
   }
 
   stop() {
-    this.close();
+    if (this.wsInterval) {
+      clearInterval(this.wsInterval);
+      this.wsInterval = null;
+      this.close();
+    }
   }
 
   close() {
-    this.wss.clients.forEach((ws) => {
-      if (ws.isAlive === false) {
-        WSRouter.closeClient(ws);
+    const clients = [...this.wss.clients];
+    clients.forEach((ws) => {
+      if (ws.isAlive) {
+        this.closeClient(ws);
       }
     });
   }
-  static setChannel(ws, routeName, channelId = null) {
+
+  addMiddlewareRoute(route) {
+    let { classes } = route;
+    if (this.middleware) {
+      if (this.middleware.classes) {
+        classes = [...new Set([...classes, ...this.middleware.classes])];
+      }
+      console.log("WIP merge WS middleware", classes, this.middleware);
+    }
+    const onDispatch = this.onDispatch.bind(this);
+    this.app.controllers.getMiddlewares().attach({
+      name: "websocket", classes, status: "start", onDispatch,
+    }).then((m) => { this.middleware = m; });
+  }
+
+  static setChannel(ws, token, routeName, channelId = null) {
+    ws.token = token;
     ws.route = routeName;
     ws.channelId = channelId;
   }
@@ -75,14 +97,14 @@ export class WSRouter {
     const access = await this.app.authServer.grantAccess(routeName, "WS", token);
     if (access.result.error) {
       console.log("WS not allowed:", routeName, token, JSON.stringify(access.result));
-      WSRouter.closeClient(ws);
+      this.closeClient(ws);
       return;
     }
     ws.isAlive = true;
     const route = this.routes[routeName];
     console.log("connected: ", routeName, route);
     ws.access = access.result;
-    WSRouter.setChannel(ws, routeName);
+    WSRouter.setChannel(ws, token, routeName);
     const that = this;
     ws.on("message", async (message) => {
       let data = null;
@@ -97,23 +119,15 @@ export class WSRouter {
         // console.log("pong");
         ws.isAlive = true;
       } else if (event === "subscribe") {
-        WSRouter.setChannel(ws, routeName, channelId);
-        if (that.middleware) {
-          console.log("TODO merge WS middleware");
-        } else {
-          const onDispatch = (className, d) => {
-            that.onDispatch(className, { event: route.event, ...d });
-          };
-          that.middleware = that.app.controllers.getMiddlewares().attach({
-            name: "websocket", classes: route.classes, status: "start", onDispatch,
-          });
-        }
+        WSRouter.setChannel(ws, token, routeName, channelId);
+        that.addMiddlewareRoute(route);
       } else if (data.event === "unsubscribe") {
         WSRouter.removeChannel(ws);
         that.app.controllers.getMiddlewares().remove(that.middleware);
       }
       if (route.callback) {
-        const response = await route.callback(event, channelId, data, ws);
+        const cId = channelId || ws.channelId;
+        const response = await route.callback(event, cId, data, ws);
         if (response) {
           ws.send(JSON.stringify(response));
         }
@@ -122,27 +136,32 @@ export class WSRouter {
     ws.on("error", (error) => {
       console.log("Error caught: ");
       console.log(error.stack);
-      WSRouter.closeClient(ws);
+      this.closeClient(ws);
     });
 
     ws.on("end", (code, reason) => {
       console.log("Connection Lost", code, reason);
-      WSRouter.closeClient(ws);
+      this.closeClient(ws);
     });
     const response = { event: "connected" };
     ws.send(JSON.stringify(response));
   }
 
   onDispatch(className, data) {
-    console.log("data.event=", data.event, data.origin);
+    let { event } = data;
+    if (!event) {
+      event = data.action;
+    }
+    console.log("data.event=", event, data.origin);
     this.wss.clients.forEach((ws) => {
+      console.log("ws=", ws.channelId, ws.route);
       // TODO check route classname /event
       if (ws.channelId === data.origin) {
         const routeName = ws.route;
         if (routeName) {
           const route = this.routes[routeName];
           if (route && route.callback) {
-            route.callback(data.event, ws.channelId, data, ws).then((payload) => {
+            route.callback(event, ws.channelId, data, ws).then((payload) => {
               if (payload) {
                 ws.send(JSON.stringify(payload));
               }
@@ -155,11 +174,19 @@ export class WSRouter {
     });
   }
 
-  static closeClient(ws) {
-    if (ws.route) {
+  closeClient(ws) {
+    ws.isAlive = false;
+    const { route } = ws;
+    if (route) {
       ws.route = null;
       ws.channelId = null;
       ws.terminate();
+      let i = -1;
+      const cs = this.wss.clients;
+      cs.forEach((w, index) => { if (w.token === ws.token && w.route === route) i = index; });
+      if (i >= 0) {
+        cs.splice(i, 1);
+      }
     }
   }
 
