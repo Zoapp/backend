@@ -40,7 +40,11 @@ export default class extends AbstractController {
     } else if (id && (!this.middlewares[id])) {
       id = null;
     }
-    let m = await this.context.pluginsManager.register(middleware);
+    let m = middleware;
+    if (!m.id) {
+      m.id = this.model.generateId(48);
+    }
+    m = await this.zoapp.pluginsManager.register(m);
     m = await this.model.register(m, id);
     m.onDispatch = middleware.onDispatch;
     return this.attachLocally(m);
@@ -54,7 +58,7 @@ export default class extends AbstractController {
 
   async remove(middleware) {
     let ret = true;
-    const m = await this.context.pluginManager.unregister(middleware);
+    const m = await this.zoapp.pluginManager.unregister(middleware);
     const { id } = m;
     ret = await this.model.unregister(id);
     if (this.middlewares[id]) {

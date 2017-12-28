@@ -8,7 +8,7 @@ export default class {
   constructor(name, main, className = null) {
     this.name = name;
     this.main = main;
-    this.context = main.context;
+    this.zoapp = main.zoapp;
     this.className = className;
   }
 
@@ -26,13 +26,12 @@ export default class {
 
   applyMiddleware(action, params, callback = null) {
     this.todo = {};
-    console.log("todo AbstractController.call");
     if (callback) {
       callback(this.todo);
     }
   }
 
   dispatch(className, data, originId = null) {
-    this.context.controllers.getMiddlewares().dispatchEvent(className, data, originId);
+    this.zoapp.controllers.getMiddlewares().dispatchEvent(className, data, originId);
   }
 }

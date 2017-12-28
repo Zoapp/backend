@@ -14,6 +14,7 @@ export default class extends CommonRoutes {
     this.admin = this.admin.bind(this);
     this.updateAdmin = this.updateAdmin.bind(this);
     this.setup = this.setup.bind(this);
+    this.getParameterValue = this.getParameterValue.bind(this);
     this.getAvailableMiddlewares = this.getAvailableMiddlewares.bind(this);
     this.getMiddlewares = this.getMiddlewares.bind(this);
     this.registerMiddleware = this.registerMiddleware.bind(this);
@@ -54,6 +55,15 @@ export default class extends CommonRoutes {
       return this.controller.getAdmin().setup();
     }
     return { todo: "admin.setup" };
+  }
+
+  async getParameterValue() {
+    const { name, type } = context.getParams();
+    const value = await this.controller.getParameters().getValue(name, type);
+    if (type) {
+      console.log("TODO tpye parameters translate");
+    }
+    return value;
   }
 
   async getAvailableMiddlewares() {

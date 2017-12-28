@@ -33,8 +33,12 @@ export default class {
     }
   }
 
-  generateId(len = 32) {
-    return this.database.generateToken(len);
+  getInnerTable(name = this.name) {
+    return this.database.getTable(name);
+  }
+
+  generateId(length = 32) {
+    return this.database.generateToken(length);
   }
 
   async open() {

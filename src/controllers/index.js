@@ -10,11 +10,11 @@ import AdminController from "./admin";
 import Parameters from "../models/parameters";
 
 class MainController {
-  constructor(context, config) {
-    this.context = context;
-    this.authServer = context.authServer;
+  constructor(zoapp, config) {
+    this.zoapp = zoapp;
+    this.authServer = zoapp.authServer;
     this.config = config || {};
-    this.database = context.database;
+    this.database = zoapp.database;
     this.users = new UsersController("Users", this);
     this.middlewares = new MiddlewaresController("Middlewares", this, "system");
     this.admin = new AdminController("Admin", this);
@@ -103,4 +103,4 @@ class MainController {
   }
 }
 
-export default (context, config) => new MainController(context, config);
+export default (zoapp, config) => new MainController(zoapp, config);

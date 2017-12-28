@@ -13,7 +13,7 @@ export default class extends AbstractModel {
   }
 
   async getMiddlewares(origin = null, type = null) {
-    const collection = this.database.getTable("middlewares");
+    const collection = this.getInnerTable();
     let query = origin ? `origin=${origin}` : null;
     if (type) {
       query = query ? `${query} AND ` : "";
@@ -30,7 +30,7 @@ export default class extends AbstractModel {
   }
 
   async register(middleware, mId = null) {
-    const collection = this.database.getTable("middlewares");
+    const collection = this.getInnerTable();
     let md = null;
     let id = null;
     let lmid = mId;
@@ -38,7 +38,7 @@ export default class extends AbstractModel {
       id = mId;
     } else {
       ({ id } = middleware);
-      md = await collection.getItem(`name=${middleware.name}`);
+      md = await collection.getItem(`name=${middleware.name} AND origin=${middleware.origin}`);
       if (md && ((!md.secret) || md.secret === middleware.secret)) {
         lmid = md.id;
         ({ id } = md);
@@ -56,7 +56,7 @@ export default class extends AbstractModel {
   }
 
   async unregister(middlewareId) {
-    const collection = this.database.getTable("middlewares");
+    const collection = this.getInnerTable();
     return collection.deleteItem(middlewareId);
   }
 }

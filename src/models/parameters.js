@@ -12,18 +12,14 @@ export default class extends AbstractModel {
     super("parameters", database, config, descriptor);
   }
 
-  getInnerTable() {
-    return this.database.getTable("parameters");
-  }
-
-  queryValue(name, collection = this.getInnerTable()) {
-    const query = `name=${name}`;
+  queryValue(name, type, collection = this.getInnerTable()) {
+    const query = `name=${name} AND type=${type}`;
     // console.log("query", query);
     return collection.getItem(query);
   }
 
-  async getValue(name, collection = this.getInnerTable()) {
-    const item = await this.queryValue(name, collection);
+  async getValue(name, type = null, collection = this.getInnerTable()) {
+    const item = await this.queryValue(name, type, collection);
     // console.log("getValue", item);
     if (item && item.value) {
       return item.value;
@@ -31,10 +27,10 @@ export default class extends AbstractModel {
     return null;
   }
 
-  async setValue(name, value, collection = this.getInnerTable()) {
-    const prev = await this.queryValue(name, collection);
+  async setValue(name, value, type = null, collection = this.getInnerTable()) {
+    const prev = await this.queryValue(name, type, collection);
     // console.log("setValue prev=", prev);
-    const item = { name, value: { ...value } };
+    const item = { name, value: { ...value }, type };
     let id = null;
     if (prev) {
       ({ id } = prev);
@@ -44,5 +40,17 @@ export default class extends AbstractModel {
     }
     // console.log("setValue", JSON.stringify(item));
     return collection.setItem(id, item);
+  }
+
+  async generateName(length = 4, type = null, collection = this.getInnerTable()) {
+    let name = null;
+    let prev = null;
+    /* eslint-disable no-await-in-loop */
+    do {
+      name = this.database.generateToken(length);
+      prev = await this.queryValue(name, type, collection);
+    } while (prev);
+    /* eslint-enable no-await-in-loop */
+    return name;
   }
 }

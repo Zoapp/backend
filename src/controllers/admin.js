@@ -29,14 +29,14 @@ export default class extends AbstractController {
           localhost: tunnel.localhost,
         };
         const url = await TunnelProvider.register(
-          this.context.pluginsManager, tunnel.provider,
+          this.zoapp.pluginsManager, tunnel.provider,
           params,
         );
         if (url !== tunnel.url) {
           console.log("TunnelProvider url changed", url);
           backend.tunnel.active.url = url;
           backend.tunnel.active.subdomain =
-          TunnelProvider.getActive(this.context.pluginsManager).subdomain;
+          TunnelProvider.getActive(this.zoapp.pluginsManager).subdomain;
           await this.main.getParameters().setValue("backend", backend);
         }
       }
@@ -60,9 +60,9 @@ export default class extends AbstractController {
       parameters.backend.tunnel = {};
     }
     // TODO remove tunnel stuff here and create a middleware dispatch for it
-    parameters.backend.tunnel.providers = TunnelProvider.listAll(this.context.pluginsManager);
+    parameters.backend.tunnel.providers = TunnelProvider.listAll(this.zoapp.pluginsManager);
     if (!parameters.backend.tunnel.active) {
-      parameters.backend.tunnel.active = TunnelProvider.getActive(this.context.pluginsManager);
+      parameters.backend.tunnel.active = TunnelProvider.getActive(this.zoapp.pluginsManager);
     }
     if (!parameters.backend.publicUrl) {
       console.log("tunnel.active=", parameters.backend.tunnel.active);
@@ -101,8 +101,8 @@ export default class extends AbstractController {
       delete parameters.backend.clientSecret;
       delete parameters.backend.tunnel;
     }
-    if (this.context.extensions && this.context.extensions.getAdminParameters) {
-      return this.context.extensions.getAdminParameters(me, isMaster, parameters);
+    if (this.zoapp.extensions && this.zoapp.extensions.getAdminParameters) {
+      return this.zoapp.extensions.getAdminParameters(me, isMaster, parameters);
     }
     return { params: parameters };
   }
@@ -120,20 +120,20 @@ export default class extends AbstractController {
       const backend = await this.main.getParameters().getValue("backend") || {};
       let prevTunnel = backend.tunnel;
       if (!prevTunnel) {
-        prevTunnel = TunnelProvider.getActive(this.context.pluginsManager) || {};
+        prevTunnel = TunnelProvider.getActive(this.zoapp.pluginsManager) || {};
       }
       if (prevTunnel.provider !== parameters.tunnel.provider) {
         if (prevTunnel.provider) {
-          await TunnelProvider.unregister(this.context.pluginsManager, prevTunnel.provider);
+          await TunnelProvider.unregister(this.zoapp.pluginsManager, prevTunnel.provider);
         }
         if (tunnel !== "None") {
           tunnel.url = await TunnelProvider.register(
-            this.context.pluginsManager, tunnel.provider,
+            this.zoapp.pluginsManager, tunnel.provider,
             tunnel,
           );
           console.log("tunnel.url", tunnel.url);
           if (tunnel.url) {
-            tunnel.subdomain = TunnelProvider.getActive(this.context.pluginsManager).subdomain;
+            tunnel.subdomain = TunnelProvider.getActive(this.zoapp.pluginsManager).subdomain;
           }
         } else {
           tunnel = null;

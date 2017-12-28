@@ -12,11 +12,11 @@ export default class extends AbstractModel {
     super("users", database, config, descriptor);
   }
 
-  getProfile(id, profiles = this.database.getTable("profiles")) {
+  getProfile(id, profiles = this.getInnerTable("profiles")) {
     return profiles.getItem(id);
   }
 
-  async createProfile(user, profiles = this.database.getTable("profiles")) {
+  async createProfile(user, profiles = this.getInnerTable("profiles")) {
     let profile = await profiles.getItem(`userId=${user.id}`);
     if (!profile) {
       // Create a minimal profile from user's informations
@@ -33,7 +33,7 @@ export default class extends AbstractModel {
     return profile;
   }
 
-  async storeProfile(profile, profiles = this.database.getTable("profiles")) {
+  async storeProfile(profile, profiles = this.getInnerTable("profiles")) {
     const p = await profiles.getItem(profile.id);
     let id = null;
     if (p) {

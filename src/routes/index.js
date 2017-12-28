@@ -45,4 +45,9 @@ export default (zoapp) => {
   route.add("PUT", "", ["owner", "admin", "master"], admin.registerMiddleware);
   route.add("DELETE", "/:middlewareId", ["owner", "admin", "master"], admin.unregisterMiddleware);
   route.add("DELETE", "/:origin/:middlewareId", ["owner", "admin", "master"], admin.unregisterMiddleware);
+
+  // /parameters routes
+  route = zoapp.createRoute("/params");
+  route.add("GET", "/:name", ["owner", "admin", "master"], admin.getParameterValue);
+  route.add("GET", "/:name/:type", ["owner", "admin", "master"], admin.getParameterValue);
 };

@@ -8,8 +8,8 @@
 import LocalTunnelPlugin from "./localtunnel";
 
 class PluginsManager {
-  constructor(context, config) {
-    this.context = context;
+  constructor(zoapp, config) {
+    this.zoapp = zoapp;
     this.config = config;
 
     this.init();
