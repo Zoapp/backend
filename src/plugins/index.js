@@ -52,8 +52,8 @@ class PluginsManager {
     // WIP
     const { name } = middleware;
     const plugin = this.get(name);
-    // console.log("register", plugin, name);
-    // console.log("register", plugin.getName());
+    // logger.info("register", plugin, name);
+    // logger.info("register", plugin.getName());
     if (plugin) {
       return plugin.register(middleware);
     }

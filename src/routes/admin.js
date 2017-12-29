@@ -61,7 +61,7 @@ export default class extends CommonRoutes {
     const { name, type } = context.getParams();
     const value = await this.controller.getParameters().getValue(name, type);
     if (type) {
-      console.log("TODO tpye parameters translate");
+      logger.info("TODO tpye parameters translate");
     }
     return value;
   }
@@ -73,7 +73,7 @@ export default class extends CommonRoutes {
   async getMiddlewares(context) {
     const { origin } = context.getParams();
     const { type } = context.getQuery();
-    // console.log("getMiddlewares", origin, type);
+    // logger.info("getMiddlewares", origin, type);
     return this.controller.getMiddlewares().list(origin, type);
   }
 

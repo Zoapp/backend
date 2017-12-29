@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { setupLogger } from "zoapp-core";
 import chai from "chai";
 import chaiHttp from "chai-http";
 import ApiServer from "../src/server";
@@ -12,6 +13,8 @@ import App from "../src/app";
 const { expect } = chai;
 
 chai.use(chaiHttp);
+
+setupLogger("test");
 
 const mysqlConfig = {
   // Global Database
@@ -41,14 +44,14 @@ const initService = async (ctx, params, commons) => {
   } else if (commons.config) {
     ({ config } = commons);
   }
-  // console.log("config=", config);
+  // logger.info("config=", config);
   const apiServer = ApiServer(config);
   const app = App(config, apiServer);
   await app.database.reset();
   await app.start();
   context.app = app;
 
-  console.log("initService with", params.title);
+  logger.info("initService with", params.title);
   context.title = params.title;
   const password = params.password ? params.password : commons.password;
   let r = await app.authServer.registerApplication({
@@ -83,14 +86,14 @@ const initService = async (ctx, params, commons) => {
 
   context.endpoint = app.endpoint;
   context.server = apiServer.server;
-  // console.log(`app=${JSON.stringify(context.application)}`);
-  // console.log(`user1=${JSON.stringify(context.user1)}`);
-  // console.log(`authUser1=${JSON.stringify(context.authUser1)}`);
+  // logger.info(`app=${JSON.stringify(context.application)}`);
+  // logger.info(`user1=${JSON.stringify(context.user1)}`);
+  // logger.info(`authUser1=${JSON.stringify(context.authUser1)}`);
   return context;
 };
 
 const buildUrl = (ctx, route, token = null) => {
-  // console.log("context=", context);
+  // logger.info("context=", context);
   let url = ctx.endpoint + route;
   if (token) {
     url += `?access_token=${token}`;
@@ -104,7 +107,7 @@ const result = (res, callback = null) => {
   /* eslint-disable no-unused-expressions */
   expect(res).to.be.json;
   /* eslint-enable no-unused-expressions */
-  // console.log(`res=${JSON.stringify(res.body)}`);
+  // logger.info(`res=${JSON.stringify(res.body)}`);
   if (callback) {
     callback(res.body);
     return null;
@@ -176,7 +179,7 @@ describeParams("API", [{ title: "MemDataset" }, { title: "MySQLDataset", config:
     it("should ping on /ping GET", async () => {
       const res = await getAsync(context, "/ping");
       expect(res).to.have.all.keys(["ping"]);
-      // console.log("context=", JSON.stringify(context));
+      // logger.info("context=", JSON.stringify(context));
     });
   });
 

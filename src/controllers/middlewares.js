@@ -32,7 +32,7 @@ export default class extends AbstractController {
   }
 
   async attach(middleware) {
-    // console.log("attach middleware=", middleware);
+    // logger.info("attach middleware=", middleware);
     let { id } = middleware; // || this.model.generateId(48);
     if (id && this.middlewares[id]) {
     // replace previous middleware
@@ -101,10 +101,10 @@ export default class extends AbstractController {
       if (m.classes) {
         match = m.classes.some(cl => cl === className);
       }
-      // console.log("test middleware=", middleware.name, " using className=",
+      // logger.info("test middleware=", middleware.name, " using className=",
       // className, "match=", match);
       if (match) {
-        // console.log("dispatch middleware=", m.name, " using className=", className,
+        // logger.info("dispatch middleware=", m.name, " using className=", className,
         // "from=", m.remote);
         if ((!origin) || (origin !== m.id && origin !== m.origin)) {
           try {
@@ -112,14 +112,14 @@ export default class extends AbstractController {
               if (m.remote) {
                 const url = `${m.url + m.path}?class=${encodeURIComponent(className)}&secret=${encodeURIComponent(m.secret)}`;
                 ret = await fetch(url, data);
-                // console.log("ret=" + ret);
+                // logger.info("ret=" + ret);
               } else if (m.onDispatch) {
-                // console.log("data.origin=", data.origin, origin);
+                // logger.info("data.origin=", data.origin, origin);
                 ret = await m.onDispatch(className, data);
               }
             }
           } catch (error) {
-            console.log("error:", error);
+            logger.info("error:", error);
             // middleware.status = "stop";
             // TODO stop / save / dispatch status
           }

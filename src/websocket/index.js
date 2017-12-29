@@ -23,14 +23,14 @@ export class WSRouter {
     });
 
     this.wss.on("error", (error) => {
-      console.log("Error caught: ");
-      console.log(error.stack);
+      logger.info("Error caught: ");
+      logger.info(error.stack);
       // that.close();
       // TODO restart
     });
 
     this.wss.on("end", (code, reason) => {
-      console.log("Connection Lost", code, reason);
+      logger.info("Connection Lost", code, reason);
       // that.close();
     });
 
@@ -41,7 +41,7 @@ export class WSRouter {
           this.closeClient(ws);
         } else {
           ws.isAlive = false;
-          // console.log("ping");
+          // logger.info("ping");
           ws.send("ping");
         }
       });
@@ -71,7 +71,7 @@ export class WSRouter {
       if (this.middleware.classes) {
         classes = [...new Set([...classes, ...this.middleware.classes])];
       }
-      console.log("WIP merge WS middleware", classes, this.middleware);
+      logger.info("WIP merge WS middleware", classes, this.middleware);
     }
     const onDispatch = this.onDispatch.bind(this);
     this.app.controllers.getMiddlewares().attach({
@@ -96,13 +96,13 @@ export class WSRouter {
     const token = location.query.access_token;
     const access = await this.app.authServer.grantAccess(routeName, "WS", token);
     if (access.result.error) {
-      console.log("WS not allowed:", routeName, token, JSON.stringify(access.result));
+      logger.info("WS not allowed:", routeName, token, JSON.stringify(access.result));
       this.closeClient(ws);
       return;
     }
     ws.isAlive = true;
     const route = this.routes[routeName];
-    console.log("connected: ", routeName, route);
+    logger.info("connected: ", routeName, route);
     ws.access = access.result;
     WSRouter.setChannel(ws, token, routeName);
     const that = this;
@@ -116,7 +116,7 @@ export class WSRouter {
       }
       const { event, channelId } = data;
       if (event === "pong") {
-        // console.log("pong");
+        // logger.info("pong");
         ws.isAlive = true;
       } else if (event === "subscribe") {
         WSRouter.setChannel(ws, token, routeName, channelId);
@@ -134,13 +134,13 @@ export class WSRouter {
       }
     });
     ws.on("error", (error) => {
-      console.log("Error caught: ");
-      console.log(error.stack);
+      logger.info("Error caught: ");
+      logger.info(error.stack);
       this.closeClient(ws);
     });
 
     ws.on("end", (code, reason) => {
-      console.log("Connection Lost", code, reason);
+      logger.info("Connection Lost", code, reason);
       this.closeClient(ws);
     });
     const response = { event: "connected" };
@@ -152,9 +152,9 @@ export class WSRouter {
     if (!event) {
       event = data.action;
     }
-    console.log("data.event=", event, data.origin);
+    logger.info("data.event=", event, data.origin);
     this.wss.clients.forEach((ws) => {
-      console.log("ws=", ws.channelId, ws.route);
+      logger.info("ws=", ws.channelId, ws.route);
       // TODO check route classname /event
       if (ws.channelId === data.origin) {
         const routeName = ws.route;

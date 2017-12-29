@@ -13,7 +13,7 @@ class CommonRoutes {
   }
 
   async access(context) {
-    // console.log("locals=" + res.locals);
+    // logger.info("locals=" + res.locals);
     const { access } = context.res.locals;
     let me = null;
     if (access) {

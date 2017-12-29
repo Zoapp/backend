@@ -28,7 +28,7 @@ class LocalTunnel {
   }
 
   fireEvent(eventName) {
-    console.log("LocalTunnel fireEvent", eventName);
+    logger.info("LocalTunnel fireEvent", eventName);
     if (this.listener) {
       this.listener.fireEvent(eventName, this);
     }
@@ -55,7 +55,7 @@ class LocalTunnel {
           this.fireEvent("close");
         });
       } catch (e) {
-        console.log("Exception in localtunnel TODO restart", e);
+        logger.info("Exception in localtunnel TODO restart", e);
       }
     });
   }

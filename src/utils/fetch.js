@@ -27,17 +27,17 @@ export default (urlValue, data = null, method = null) => {
     headers: { "Cache-Control": "no-cache", "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) },
   };
   return new Promise((resolve, reject) => {
-    // console.log("fetch=", u, m, data);
+    // logger.info("fetch=", u, m, data);
     try {
       const req = http.request(options, (res) => {
-        // console.log("status=", res.statusCode);
-        // console.log("Headers=", JSON.stringify(res.headers));
+        // logger.info("status=", res.statusCode);
+        // logger.info("Headers=", JSON.stringify(res.headers));
         res.setEncoding("utf8");
         if (res.statusCode === 200) {
           const chunks = [];
           res.on("data", chunk => chunks.push(chunk));
           res.on("end", () => {
-            // console.log("body=", chunks);
+            // logger.info("body=", chunks);
             let params = null;
             const bodybody = chunks.join("");
             if (bodybody) {
@@ -50,17 +50,17 @@ export default (urlValue, data = null, method = null) => {
         }
       });
       req.on("error", (e) => {
-        console.log("error in request:", e.message);
+        logger.info("error in request:", e.message);
         reject(e);
       });
       // write data to request body
       if (data) {
-        // console.log("body=", body);
+        // logger.info("body=", body);
         req.write(body);
       }
       req.end();
     } catch (e) {
-      console.log("error in request:", e.message);
+      logger.info("error in request:", e.message);
     }
   });
 };

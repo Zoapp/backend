@@ -33,7 +33,7 @@ export default class extends AbstractController {
           params,
         );
         if (url !== tunnel.url) {
-          console.log("TunnelProvider url changed", url);
+          logger.info("TunnelProvider url changed", url);
           backend.tunnel.active.url = url;
           backend.tunnel.active.subdomain =
           TunnelProvider.getActive(this.zoapp.pluginsManager).subdomain;
@@ -65,7 +65,7 @@ export default class extends AbstractController {
       parameters.backend.tunnel.active = TunnelProvider.getActive(this.zoapp.pluginsManager);
     }
     if (!parameters.backend.publicUrl) {
-      console.log("tunnel.active=", parameters.backend.tunnel.active);
+      logger.info("tunnel.active=", parameters.backend.tunnel.active);
       if (parameters.backend.tunnel.active) {
         parameters.backend.publicUrl = parameters.backend.tunnel.active.url || "";
       } else {
@@ -116,7 +116,7 @@ export default class extends AbstractController {
         tunnel.port = cfg.global.api.port;
       }
       // TODO remove tunnel stuff here and create a middleware dispatch for it
-      console.log("tunnel=", tunnel);
+      logger.info("tunnel=", tunnel);
       const backend = await this.main.getParameters().getValue("backend") || {};
       let prevTunnel = backend.tunnel;
       if (!prevTunnel) {
@@ -131,7 +131,7 @@ export default class extends AbstractController {
             this.zoapp.pluginsManager, tunnel.provider,
             tunnel,
           );
-          console.log("tunnel.url", tunnel.url);
+          logger.info("tunnel.url", tunnel.url);
           if (tunnel.url) {
             tunnel.subdomain = TunnelProvider.getActive(this.zoapp.pluginsManager).subdomain;
           }
@@ -139,7 +139,7 @@ export default class extends AbstractController {
           tunnel = null;
         }
         backend.tunnel = { active: { ...tunnel } };
-        console.log("backend.tunnel", backend.tunnel);
+        logger.info("backend.tunnel", backend.tunnel);
         await this.main.getParameters().setValue("backend", backend);
       }
     } else if (parameters.backend) {

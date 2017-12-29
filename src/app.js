@@ -15,7 +15,7 @@ class App {
   constructor(configuration = {}, server = null) {
     this.name = configuration.name || "Zoapp backend";
     this.version = configuration.version || "";
-    console.log(`Start ${this.name} ${this.version}`);
+    logger.info(`Start ${this.name} ${this.version}`);
     const configEmpty = Object.keys(configuration).length === 0 ? {} : null;
     let globalDbConfig = null;
     if ((configuration.global && configuration.global.database) || configEmpty) {
@@ -23,7 +23,7 @@ class App {
     }
     if (globalDbConfig) {
       this.database = dbCreate(globalDbConfig);
-      // console.log("db",this.database);
+      // logger.info("db",this.database);
     }
     let authConfig = {};
     if (configuration.auth) {
@@ -122,7 +122,7 @@ class App {
   }
 
   async close() {
-    console.log(`Stop ${this.name}`);
+    logger.info(`Stop ${this.name}`);
     if (this.wsRouter) {
       await this.wsRouter.stop();
     }

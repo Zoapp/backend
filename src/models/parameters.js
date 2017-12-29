@@ -14,13 +14,13 @@ export default class extends AbstractModel {
 
   queryValue(name, type, collection = this.getInnerTable()) {
     const query = `name=${name} AND type=${type}`;
-    // console.log("query", query);
+    // logger.info("query", query);
     return collection.getItem(query);
   }
 
   async getValue(name, type = null, collection = this.getInnerTable()) {
     const item = await this.queryValue(name, type, collection);
-    // console.log("getValue", item);
+    // logger.info("getValue", item);
     if (item && item.value) {
       return item.value;
     }
@@ -29,7 +29,7 @@ export default class extends AbstractModel {
 
   async setValue(name, value, type = null, collection = this.getInnerTable()) {
     const prev = await this.queryValue(name, type, collection);
-    // console.log("setValue prev=", prev);
+    // logger.info("setValue prev=", prev);
     const item = { name, value: { ...value }, type };
     let id = null;
     if (prev) {
@@ -38,7 +38,7 @@ export default class extends AbstractModel {
     } else {
       item.id = this.generateId(48);
     }
-    // console.log("setValue", JSON.stringify(item));
+    // logger.info("setValue", JSON.stringify(item));
     return collection.setItem(id, item);
   }
 

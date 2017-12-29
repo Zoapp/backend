@@ -17,7 +17,7 @@ const Zoapp = (config) => {
   const shutdown = () => {
     const close = async () => {
       await app.close();
-      console.log("Closed out remaining connections / services.");
+      logger.info("Closed out remaining connections / services.");
       process.exit(0);
     };
     close();

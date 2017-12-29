@@ -14,7 +14,7 @@ const TunnelProvider = {
 
   async register(pluginsManager, providerName, params) {
     // TODO
-    console.log("tunnelProvider.register", providerName);
+    logger.info("tunnelProvider.register", providerName);
     provider = { ...params };
     /* const plugin = pluginsManager.get(providerName);
     let url = null;
@@ -25,10 +25,10 @@ const TunnelProvider = {
           const a = provider.url.indexOf("//")+2;
           const b = provider.url.indexOf(".");
           provider.subdomain = provider.url.substring(a, b);
-          console.log("subdomain=", provider.subdomain);
+          logger.info("subdomain=", provider.subdomain);
         }
       } catch (e) {
-        console.log("TunnelProvider.register Error=", e);
+        logger.info("TunnelProvider.register Error=", e);
       }
     } */
     return provider.url;
@@ -36,7 +36,7 @@ const TunnelProvider = {
 
   async unregister(pluginsManager, providerName) {
     // TODO
-    console.log("tunnelProvider.unregister", providerName);
+    logger.info("tunnelProvider.unregister", providerName);
     if (provider.provider === providerName) {
       provider = null;
       const plugin = pluginsManager.get(providerName);
@@ -44,7 +44,7 @@ const TunnelProvider = {
         try {
           await plugin.unregister();
         } catch (e) {
-          console.log("TunnelProvider.unregister Error=", e);
+          logger.info("TunnelProvider.unregister Error=", e);
         }
       }
     }
@@ -52,7 +52,7 @@ const TunnelProvider = {
 
   getActive() {
     // WIP
-    // console.log("TunnelProvider.getActive ", pluginManager);
+    // logger.info("TunnelProvider.getActive ", pluginManager);
     return provider;
   },
 
