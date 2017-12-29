@@ -48,6 +48,6 @@ export default (zoapp) => {
 
   // /parameters routes
   route = zoapp.createRoute("/params");
-  route.add("GET", "/:name", ["owner", "admin", "master", "application"], admin.getParameterValue);
-  route.add("GET", "/:name/:type", ["owner", "admin", "master", "application"], admin.getParameterValue);
+  route.add("GET", "/:name", ["admin", "master", "application"], admin.getParameterValue);
+  route.add("GET", "/:name/:type", ["admin", "master", "application"], admin.getParameterValue);
 };

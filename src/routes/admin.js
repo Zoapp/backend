@@ -57,11 +57,11 @@ export default class extends CommonRoutes {
     return { todo: "admin.setup" };
   }
 
-  async getParameterValue() {
+  async getParameterValue(context) {
     const { name, type } = context.getParams();
     const value = await this.controller.getParameters().getValue(name, type);
     if (type) {
-      logger.info("TODO tpye parameters translate");
+      logger.info("TODO type parameters translate");
     }
     return value;
   }
