@@ -23,14 +23,14 @@ export class WSRouter {
     });
 
     this.wss.on("error", (error) => {
-      logger.info("Error caught: ");
-      logger.info(error.stack);
+      logger.error("WSS Error caught: ");
+      logger.error(error.stack);
       // that.close();
       // TODO restart
     });
 
     this.wss.on("end", (code, reason) => {
-      logger.info("Connection Lost", code, reason);
+      logger.info("WSS Connection Lost", code, reason);
       // that.close();
     });
 
@@ -96,7 +96,7 @@ export class WSRouter {
     const token = location.query.access_token;
     const access = await this.app.authServer.grantAccess(routeName, "WS", token);
     if (access.result.error) {
-      logger.info("WS not allowed:", routeName, token, JSON.stringify(access.result));
+      logger.error("WS not allowed:", routeName, token, JSON.stringify(access.result));
       this.closeClient(ws);
       return;
     }
@@ -134,13 +134,13 @@ export class WSRouter {
       }
     });
     ws.on("error", (error) => {
-      logger.info("Error caught: ");
-      logger.info(error.stack);
+      logger.error("WS Error caught: ");
+      logger.error(error.stack);
       this.closeClient(ws);
     });
 
     ws.on("end", (code, reason) => {
-      logger.info("Connection Lost", code, reason);
+      logger.info("WS Connection Lost", code, reason);
       this.closeClient(ws);
     });
     const response = { event: "connected" };
