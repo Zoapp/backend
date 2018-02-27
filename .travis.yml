@@ -10,4 +10,22 @@ cache: yarn
 
 install: yarn
 script:
+  # we do not run lint because of a missing src/config.js file, cf.
+  # https://github.com/Zoapp/backend/issues/9
+  #- yarn lint
   - yarn test
+
+jobs:
+  include:
+    - stage: npm release
+      node_js: "8"
+      script: yarn compile
+      before_deploy:
+        - cd dist
+      deploy:
+        provider: npm
+        email: "$NPM_EMAIL"
+        api_key: "$NPM_TOKEN"
+        skip_cleanup: true
+        on:
+          tags: true
