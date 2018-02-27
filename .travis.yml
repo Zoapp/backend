@@ -1,12 +1,31 @@
 language: node_js
-sudo: false
 node_js:
-  - "8.5"
-install:
-  - npm install
-script:
-  - npm test
-env:
-  - NODE_ENV=TEST
+  - "8"
+  - "9"
+
 addons:
   mariadb: '10.2'
+
+cache: yarn
+
+install: yarn
+script:
+  # we do not run lint because of a missing src/config.js file, cf.
+  # https://github.com/Zoapp/backend/issues/9
+  #- yarn lint
+  - yarn test
+
+jobs:
+  include:
+    - stage: npm release
+      node_js: "8"
+      script: yarn compile
+      before_deploy:
+        - cd dist
+      deploy:
+        provider: npm
+        email: "$NPM_EMAIL"
+        api_key: "$NPM_TOKEN"
+        skip_cleanup: true
+        on:
+          tags: true
