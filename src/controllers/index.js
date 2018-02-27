@@ -55,10 +55,12 @@ class MainController {
     if (uniqueScope) {
       // WIP check if a scope is unique
       const auths = await this.authServer.getAuthsWithScope(uniqueScope, clientId);
-      if (auths.length === 0) {
+
+      if (!auths || (auths && auths.length === 0)) {
         sc = uniqueScope;
       }
     }
+
     const payload = await this.authServer.authorizeAccess({
       username: user.username,
       password: user.password,
@@ -72,6 +74,7 @@ class MainController {
     if (payload.result.redirect_uri === "localhost") {
       return sc;
     }
+
     return null;
   }
 
