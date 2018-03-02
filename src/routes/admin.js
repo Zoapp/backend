@@ -28,7 +28,9 @@ export default class extends CommonRoutes {
     const isMaster = scope === "master";
     const isAdmin = isMaster || scope === "admin";
     // WIP get backend parameters
-    return this.controller.getAdmin().getParameters(me, clientId, isAdmin, isMaster);
+    return this.controller
+      .getAdmin()
+      .getParameters(me, clientId, isAdmin, isMaster);
   }
 
   async updateAdmin(context) {

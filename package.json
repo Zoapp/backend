@@ -10,7 +10,7 @@
     "compile": "yarn compile:dev && rm -r -f ./dist/config.j* && rm -r -f ./dist/index.j* && mv ./dist/zoapp.js ./dist/index.js",
     "compile:dev": "yarn clean-dist && babel src -s -D -d dist && cp -f ./package.json ./dist/package.json && cp -f ./LICENSE ./dist/LICENSE && cp -f ./README.md ./dist/README.md",
     "dev": "yarn compile:dev && yarn start:dev",
-    "lint": "eslint src",
+    "lint": "eslint src test",
     "start": "node dist",
     "start:dev": "nodemon -w src --exec \"babel-node src \"",
     "test": "eslint test --rule 'no-console: off' --fix && ./node_modules/.bin/mocha --compilers js:babel-core/register --exit"
@@ -39,8 +39,11 @@
     "chai-http": "^3.0.0",
     "eslint": "^4.13.1",
     "eslint-config-airbnb-base": "12.1.0",
+    "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-import": "2.8.0",
+    "eslint-plugin-prettier": "^2.6.0",
     "mocha": "^4.0.1",
-    "nodemon": "^1.13.3"
+    "nodemon": "^1.13.3",
+    "prettier": "^1.11.1"
   }
 }

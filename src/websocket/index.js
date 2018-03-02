@@ -74,9 +74,17 @@ export class WSRouter {
       logger.info("WIP merge WS middleware", classes, this.middleware);
     }
     const onDispatch = this.onDispatch.bind(this);
-    this.app.controllers.getMiddlewares().attach({
-      name: "websocket", classes, status: "start", onDispatch,
-    }).then((m) => { this.middleware = m; });
+    this.app.controllers
+      .getMiddlewares()
+      .attach({
+        name: "websocket",
+        classes,
+        status: "start",
+        onDispatch,
+      })
+      .then((m) => {
+        this.middleware = m;
+      });
   }
 
   static setChannel(ws, token, routeName, channelId = null) {
@@ -94,9 +102,18 @@ export class WSRouter {
     // TODO check access_token and route using pathname
     const routeName = location.pathname;
     const token = location.query.access_token;
-    const access = await this.app.authServer.grantAccess(routeName, "WS", token);
+    const access = await this.app.authServer.grantAccess(
+      routeName,
+      "WS",
+      token,
+    );
     if (access.result.error) {
-      logger.error("WS not allowed:", routeName, token, JSON.stringify(access.result));
+      logger.error(
+        "WS not allowed:",
+        routeName,
+        token,
+        JSON.stringify(access.result),
+      );
       this.closeClient(ws);
       return;
     }
@@ -183,7 +200,9 @@ export class WSRouter {
       ws.terminate();
       let i = -1;
       const cs = this.wss.clients;
-      cs.forEach((w, index) => { if (w.token === ws.token && w.route === route) i = index; });
+      cs.forEach((w, index) => {
+        if (w.token === ws.token && w.route === route) i = index;
+      });
       if (i >= 0) {
         cs.splice(i, 1);
       }
@@ -193,7 +212,10 @@ export class WSRouter {
   on(path, scope, classes, event, callback) {
     this.app.authServer.addRoute(path, scope, "WS");
     this.routes[path] = {
-      callback, scope, classes, event,
+      callback,
+      scope,
+      classes,
+      event,
     };
   }
 

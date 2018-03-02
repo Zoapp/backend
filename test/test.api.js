@@ -155,60 +155,75 @@ const deleteAsync = async (context, route, token) => {
 
 const describeParams = (name, datasets, commonDatasets, func) => {
   datasets.forEach((params) => {
-    describe(`${name} using ${params.title}`, () => func(params, commonDatasets));
+    describe(`${name} using ${params.title}`, () =>
+      func(params, commonDatasets));
   });
 };
 
 let context = null;
 
-describeParams("API", [{ title: "MemDataset" }, { title: "MySQLDataset", config: mysqlConfig }], { password: "12345" }, (params, commons) => {
-  before(async () => {
-    context = await initService({}, params, commons);
-  });
-
-  after(async () => {
-    await context.app.database.delete();
-    await context.app.close();
-  });
-
-  describe("/", () => {
-    it("should return send infos on / GET", async () => {
-      const res = await getAsync(context, "/");
-      expect(res).to.have.all.keys(["version", "name"]);
+describeParams(
+  "API",
+  [{ title: "MemDataset" }, { title: "MySQLDataset", config: mysqlConfig }],
+  { password: "12345" },
+  (params, commons) => {
+    before(async () => {
+      context = await initService({}, params, commons);
     });
-    it("should ping on /ping GET", async () => {
-      const res = await getAsync(context, "/ping");
-      expect(res).to.have.all.keys(["ping"]);
-      // logger.info("context=", JSON.stringify(context));
-    });
-  });
 
-  describe("/users", () => {
-    it("should get currentUser on /me GET", async () => {
-      context.userProfile1 = await getAsync(context, "/me", context.authUser1.access_token);
-      // WIP
-      expect(context.userProfile1).to.have.all.keys(["id", "username", "avatar", "email"]);
+    after(async () => {
+      await context.app.database.delete();
+      await context.app.close();
     });
-    it("should list users on /users GET"); // TODO
-    it("should get a SINGLE user on /users/:id GET", async () => {
-      const res = await getAsync(
-        context, `/users/${context.userProfile1.id}`,
-        context.authUser1.access_token,
-      );
-      // WIP
-      expect(res).to.have.all.keys(["id", "username", "avatar", "email"]);
+
+    describe("/", () => {
+      it("should return send infos on / GET", async () => {
+        const res = await getAsync(context, "/");
+        expect(res).to.have.all.keys(["version", "name"]);
+      });
+      it("should ping on /ping GET", async () => {
+        const res = await getAsync(context, "/ping");
+        expect(res).to.have.all.keys(["ping"]);
+        // logger.info("context=", JSON.stringify(context));
+      });
     });
-    it("should create a SINGLE user on /users POST"); // TODO
-    it("should update a SINGLE user on /users/<id> PUT"); // TODO
-    it("should delete a SINGLE user on /users/<id> DELETE"); // TODO
-  });
 
-  describe("/admin", () => {
-    it("should get admin infos /admin GET");
-  });
+    describe("/users", () => {
+      it("should get currentUser on /me GET", async () => {
+        context.userProfile1 = await getAsync(
+          context,
+          "/me",
+          context.authUser1.access_token,
+        );
+        // WIP
+        expect(context.userProfile1).to.have.all.keys([
+          "id",
+          "username",
+          "avatar",
+          "email",
+        ]);
+      });
+      it("should list users on /users GET"); // TODO
+      it("should get a SINGLE user on /users/:id GET", async () => {
+        const res = await getAsync(
+          context,
+          `/users/${context.userProfile1.id}`,
+          context.authUser1.access_token,
+        );
+        // WIP
+        expect(res).to.have.all.keys(["id", "username", "avatar", "email"]);
+      });
+      it("should create a SINGLE user on /users POST"); // TODO
+      it("should update a SINGLE user on /users/<id> PUT"); // TODO
+      it("should delete a SINGLE user on /users/<id> DELETE"); // TODO
+    });
 
-  // TODO middlewares
-  /* describe("/webhooks", () => {
+    describe("/admin", () => {
+      it("should get admin infos /admin GET");
+    });
+
+    // TODO middlewares
+    /* describe("/webhooks", () => {
     it("should register webhook /webhooks POST", async () => {
       context.webhook = await postAsync(
           context,
@@ -236,4 +251,5 @@ describeParams("API", [{ title: "MemDataset" }, { title: "MySQLDataset", config:
     });
     it("should test webhook /webhooks/:id/test/:action POST");
   }); */
-});
+  },
+);

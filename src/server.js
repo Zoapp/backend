@@ -19,7 +19,10 @@ class Server {
     this.app.options("/*", (req, res) => {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With, access_token, client_id, client_secret");
+      res.header(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization, Content-Length, X-Requested-With, access_token, client_id, client_secret",
+      );
       res.sendStatus(200);
     });
     this.config = config;
@@ -40,4 +43,4 @@ class Server {
   }
 }
 
-export default config => new Server(config);
+export default (config) => new Server(config);

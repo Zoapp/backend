@@ -35,9 +35,9 @@ export default class extends AbstractController {
     // logger.info("attach middleware=", middleware);
     let { id } = middleware; // || this.model.generateId(48);
     if (id && this.middlewares[id]) {
-    // replace previous middleware
+      // replace previous middleware
       delete this.middlewares[id];
-    } else if (id && (!this.middlewares[id])) {
+    } else if (id && !this.middlewares[id]) {
       id = null;
     }
     let m = middleware;
@@ -52,7 +52,11 @@ export default class extends AbstractController {
 
   attachLocally(m) {
     this.middlewares[m.id] = m;
-    this.dispatch(this.className, { action: "setMiddleware", m, origin: m.origin }, m.id);
+    this.dispatch(
+      this.className,
+      { action: "setMiddleware", m, origin: m.origin },
+      m.id,
+    );
     return m;
   }
 
@@ -68,7 +72,11 @@ export default class extends AbstractController {
       ret = false;
     }
 
-    this.dispatch(this.className, { action: "removeMiddleware", middleware, origin: middleware.origin }, middleware.id);
+    this.dispatch(
+      this.className,
+      { action: "removeMiddleware", middleware, origin: middleware.origin },
+      middleware.id,
+    );
     return ret;
   }
 
@@ -99,18 +107,20 @@ export default class extends AbstractController {
       const m = this.middlewares[id];
       let match = null;
       if (m.classes) {
-        match = m.classes.some(cl => cl === className);
+        match = m.classes.some((cl) => cl === className);
       }
       // logger.info("test middleware=", middleware.name, " using className=",
       // className, "match=", match);
       if (match) {
         // logger.info("dispatch middleware=", m.name, " using className=", className,
         // "from=", m.remote);
-        if ((!origin) || (origin !== m.id && origin !== m.origin)) {
+        if (!origin || (origin !== m.id && origin !== m.origin)) {
           try {
             if (m.status === "start") {
               if (m.remote) {
-                const url = `${m.url + m.path}?class=${encodeURIComponent(className)}&secret=${encodeURIComponent(m.secret)}`;
+                const url = `${m.url + m.path}?class=${encodeURIComponent(
+                  className,
+                )}&secret=${encodeURIComponent(m.secret)}`;
                 ret = await fetch(url, data);
                 // logger.info("ret=" + ret);
               } else if (m.onDispatch) {

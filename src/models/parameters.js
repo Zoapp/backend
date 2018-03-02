@@ -42,7 +42,11 @@ export default class extends AbstractModel {
     return collection.setItem(id, item);
   }
 
-  async generateName(length = 4, type = null, collection = this.getInnerTable()) {
+  async generateName(
+    length = 4,
+    type = null,
+    collection = this.getInnerTable(),
+  ) {
     let name = null;
     let prev = null;
     /* eslint-disable no-await-in-loop */

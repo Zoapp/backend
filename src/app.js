@@ -18,7 +18,10 @@ class App {
     logger.info(`Start ${this.name} ${this.version}`);
     const configEmpty = Object.keys(configuration).length === 0 ? {} : null;
     let globalDbConfig = null;
-    if ((configuration.global && configuration.global.database) || configEmpty) {
+    if (
+      (configuration.global && configuration.global.database) ||
+      configEmpty
+    ) {
       globalDbConfig = configEmpty || configuration.global.database;
     }
     if (globalDbConfig) {
@@ -143,4 +146,3 @@ class App {
 }
 
 export default (config = {}, server = null) => new App(config, server);
-

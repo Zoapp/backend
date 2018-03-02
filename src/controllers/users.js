@@ -30,7 +30,7 @@ export default class extends AbstractController {
       // this.dispatch("updateUserProfile", profile);
     }
 
-    if ((!profile) && params.id) {
+    if (!profile && params.id) {
       profile = this.model.getProfile(params.id);
       // this.dispatch("updateUserProfile", profile);
     }
