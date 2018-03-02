@@ -33,4 +33,3 @@ const Zoapp = (config, log = "debug") => {
 
 export { Controller, Model, CommonRoutes };
 export default Zoapp;
-

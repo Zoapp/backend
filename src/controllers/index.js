@@ -54,7 +54,10 @@ class MainController {
     let sc = scope;
     if (uniqueScope) {
       // WIP check if a scope is unique
-      const auths = await this.authServer.getAuthsWithScope(uniqueScope, clientId);
+      const auths = await this.authServer.getAuthsWithScope(
+        uniqueScope,
+        clientId,
+      );
 
       if (!auths || (auths && auths.length === 0)) {
         sc = uniqueScope;

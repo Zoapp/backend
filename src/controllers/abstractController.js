@@ -32,6 +32,8 @@ export default class {
   }
 
   dispatch(className, data, originId = null) {
-    this.zoapp.controllers.getMiddlewares().dispatchEvent(className, data, originId);
+    this.zoapp.controllers
+      .getMiddlewares()
+      .dispatchEvent(className, data, originId);
   }
 }

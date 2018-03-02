@@ -24,7 +24,7 @@ export default class extends AbstractModel {
 
   static isType(middleware, type) {
     if (middleware.types) {
-      return middleware.types.some(t => t === type);
+      return middleware.types.some((t) => t === type);
     }
     return false;
   }
@@ -38,8 +38,10 @@ export default class extends AbstractModel {
       id = mId;
     } else {
       ({ id } = middleware);
-      md = await collection.getItem(`name=${middleware.name} AND origin=${middleware.origin}`);
-      if (md && ((!md.secret) || md.secret === middleware.secret)) {
+      md = await collection.getItem(
+        `name=${middleware.name} AND origin=${middleware.origin}`,
+      );
+      if (md && (!md.secret || md.secret === middleware.secret)) {
         lmid = md.id;
         ({ id } = md);
       }

@@ -15,7 +15,7 @@ export default class extends AbstractController {
 
   async open() {
     await super.open();
-    const backend = await this.main.getParameters().getValue("backend") || { };
+    const backend = (await this.main.getParameters().getValue("backend")) || {};
     // TODO remove tunnel init here and create a middleware dispatch for it
     if (backend.tunnel) {
       const tunnel = backend.tunnel.active;
@@ -29,14 +29,16 @@ export default class extends AbstractController {
           localhost: tunnel.localhost,
         };
         const url = await TunnelProvider.register(
-          this.zoapp.pluginsManager, tunnel.provider,
+          this.zoapp.pluginsManager,
+          tunnel.provider,
           params,
         );
         if (url !== tunnel.url) {
           logger.info("TunnelProvider url changed", url);
           backend.tunnel.active.url = url;
-          backend.tunnel.active.subdomain =
-          TunnelProvider.getActive(this.zoapp.pluginsManager).subdomain;
+          backend.tunnel.active.subdomain = TunnelProvider.getActive(
+            this.zoapp.pluginsManager,
+          ).subdomain;
           await this.main.getParameters().setValue("backend", backend);
         }
       }
@@ -60,39 +62,60 @@ export default class extends AbstractController {
       parameters.backend.tunnel = {};
     }
     // TODO remove tunnel stuff here and create a middleware dispatch for it
-    parameters.backend.tunnel.providers = TunnelProvider.listAll(this.zoapp.pluginsManager);
+    parameters.backend.tunnel.providers = TunnelProvider.listAll(
+      this.zoapp.pluginsManager,
+    );
     if (!parameters.backend.tunnel.active) {
-      parameters.backend.tunnel.active = TunnelProvider.getActive(this.zoapp.pluginsManager);
+      parameters.backend.tunnel.active = TunnelProvider.getActive(
+        this.zoapp.pluginsManager,
+      );
     }
     if (!parameters.backend.publicUrl) {
       logger.info("tunnel.active=", parameters.backend.tunnel.active);
       if (parameters.backend.tunnel.active) {
-        parameters.backend.publicUrl = parameters.backend.tunnel.active.url || "";
+        parameters.backend.publicUrl =
+          parameters.backend.tunnel.active.url || "";
       } else {
         parameters.backend.publicUrl = "";
       }
     }
+
     const cfg = this.main.config;
     if (!parameters.backend.apiUrl) {
-      parameters.backend.apiUrl = `${cfg.global.api.ip}:${cfg.global.api.port}${cfg.global.api.endpoint}/${cfg.global.api.version}/`;
+      parameters.backend.apiUrl = [
+        `${cfg.global.api.ip}:${cfg.global.api.port}`,
+        cfg.global.api.endpoint,
+        `/${cfg.global.api.version}/`,
+      ].join("");
     }
+
     if (!parameters.backend.authUrl) {
-      parameters.backend.authUrl = `${cfg.global.api.ip}:${cfg.global.api.port}${cfg.auth.api.endpoint}/`;
+      parameters.backend.authUrl = [
+        `${cfg.global.api.ip}:${cfg.global.api.port}`,
+        `${cfg.auth.api.endpoint}/`,
+      ].join("");
     }
+
     if (!parameters.backend.clientId) {
       // TODO get ClientId
       parameters.backend.clientId = clientId;
     }
+
     if (!parameters.backend.clientSecret) {
       // TODO get ClientSecret
       const app = await this.main.getApplication(clientId);
       parameters.backend.clientSecret = app.secret;
     }
+
     // WIP get emailServer settings
-    parameters.emailServer = await this.main.getParameters().getValue("emailServer");
+    parameters.emailServer = await this.main
+      .getParameters()
+      .getValue("emailServer");
+
     if (!parameters.emailServer) {
       parameters.emailServer = {};
     }
+
     if (!isAdmin) {
       delete parameters.emailServer;
       delete parameters.backend.apiUrl;
@@ -101,9 +124,11 @@ export default class extends AbstractController {
       delete parameters.backend.clientSecret;
       delete parameters.backend.tunnel;
     }
+
     if (this.zoapp.extensions && this.zoapp.extensions.getAdminParameters) {
       return this.zoapp.extensions.getAdminParameters(me, isMaster, parameters);
     }
+
     return { params: parameters };
   }
 
@@ -117,23 +142,30 @@ export default class extends AbstractController {
       }
       // TODO remove tunnel stuff here and create a middleware dispatch for it
       logger.info("tunnel=", tunnel);
-      const backend = await this.main.getParameters().getValue("backend") || {};
+      const backend =
+        (await this.main.getParameters().getValue("backend")) || {};
       let prevTunnel = backend.tunnel;
       if (!prevTunnel) {
         prevTunnel = TunnelProvider.getActive(this.zoapp.pluginsManager) || {};
       }
       if (prevTunnel.provider !== parameters.tunnel.provider) {
         if (prevTunnel.provider) {
-          await TunnelProvider.unregister(this.zoapp.pluginsManager, prevTunnel.provider);
+          await TunnelProvider.unregister(
+            this.zoapp.pluginsManager,
+            prevTunnel.provider,
+          );
         }
         if (tunnel !== "None") {
           tunnel.url = await TunnelProvider.register(
-            this.zoapp.pluginsManager, tunnel.provider,
+            this.zoapp.pluginsManager,
+            tunnel.provider,
             tunnel,
           );
           logger.info("tunnel.url", tunnel.url);
           if (tunnel.url) {
-            tunnel.subdomain = TunnelProvider.getActive(this.zoapp.pluginsManager).subdomain;
+            tunnel.subdomain = TunnelProvider.getActive(
+              this.zoapp.pluginsManager,
+            ).subdomain;
           }
         } else {
           tunnel = null;
@@ -150,7 +182,9 @@ export default class extends AbstractController {
       }
       await this.main.getParameters().setValue("backend", parameters.backend);
     } else if (parameters.emailServer) {
-      await this.main.getParameters().setValue("emailServer", parameters.emailServer);
+      await this.main
+        .getParameters()
+        .setValue("emailServer", parameters.emailServer);
     }
     return this.getParameters(clientId, true);
   }

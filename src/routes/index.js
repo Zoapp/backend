@@ -37,17 +37,57 @@ export default (zoapp) => {
 
   // /middlewares routes
   route = zoapp.createRoute("/middlewares");
-  route.add("GET", "", ["owner", "admin", "master"], admin.getAvailableMiddlewares);
-  route.add("GET", "/:origin", ["owner", "admin", "master"], admin.getMiddlewares);
-  route.add("POST", "/:origin", ["owner", "admin", "master"], admin.registerMiddleware);
-  route.add("PUT", "/:origin", ["owner", "admin", "master"], admin.registerMiddleware);
+  route.add(
+    "GET",
+    "",
+    ["owner", "admin", "master"],
+    admin.getAvailableMiddlewares,
+  );
+  route.add(
+    "GET",
+    "/:origin",
+    ["owner", "admin", "master"],
+    admin.getMiddlewares,
+  );
+  route.add(
+    "POST",
+    "/:origin",
+    ["owner", "admin", "master"],
+    admin.registerMiddleware,
+  );
+  route.add(
+    "PUT",
+    "/:origin",
+    ["owner", "admin", "master"],
+    admin.registerMiddleware,
+  );
   route.add("POST", "", ["owner", "admin", "master"], admin.registerMiddleware);
   route.add("PUT", "", ["owner", "admin", "master"], admin.registerMiddleware);
-  route.add("DELETE", "/:middlewareId", ["owner", "admin", "master"], admin.unregisterMiddleware);
-  route.add("DELETE", "/:origin/:middlewareId", ["owner", "admin", "master"], admin.unregisterMiddleware);
+  route.add(
+    "DELETE",
+    "/:middlewareId",
+    ["owner", "admin", "master"],
+    admin.unregisterMiddleware,
+  );
+  route.add(
+    "DELETE",
+    "/:origin/:middlewareId",
+    ["owner", "admin", "master"],
+    admin.unregisterMiddleware,
+  );
 
   // /parameters routes
   route = zoapp.createRoute("/params");
-  route.add("GET", "/:name", ["admin", "master", "application"], admin.getParameterValue);
-  route.add("GET", "/:name/:type", ["admin", "master", "application"], admin.getParameterValue);
+  route.add(
+    "GET",
+    "/:name",
+    ["admin", "master", "application"],
+    admin.getParameterValue,
+  );
+  route.add(
+    "GET",
+    "/:name/:type",
+    ["admin", "master", "application"],
+    admin.getParameterValue,
+  );
 };

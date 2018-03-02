@@ -34,7 +34,10 @@ class CommonRoutes {
 
   infos() {
     this.params = {};
-    return { version: this.controller.getVersion() || "0", name: this.controller.getName() || "Zoapp" };
+    return {
+      version: this.controller.getVersion() || "0",
+      name: this.controller.getName() || "Zoapp",
+    };
   }
 }
 

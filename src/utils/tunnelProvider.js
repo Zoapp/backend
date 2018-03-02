@@ -7,7 +7,6 @@
 let provider = null;
 
 const TunnelProvider = {
-
   listAll(pluginsManager) {
     return pluginsManager.getPluginsNameList("TunnelProvider");
   },
@@ -55,7 +54,6 @@ const TunnelProvider = {
     // logger.info("TunnelProvider.getActive ", pluginManager);
     return provider;
   },
-
 };
 
 export default TunnelProvider;

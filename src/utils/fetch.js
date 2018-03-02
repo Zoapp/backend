@@ -11,7 +11,7 @@ import url from "url";
 export default (urlValue, data = null, method = null) => {
   const u = url.parse(urlValue);
   let m = method;
-  if ((!m) && data) {
+  if (!m && data) {
     m = "POST";
   }
   let body = "";
@@ -24,7 +24,11 @@ export default (urlValue, data = null, method = null) => {
     port: u.port,
     path: u.path,
     method: m,
-    headers: { "Cache-Control": "no-cache", "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) },
+    headers: {
+      "Cache-Control": "no-cache",
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(body),
+    },
   };
   return new Promise((resolve, reject) => {
     // logger.info("fetch=", u, m, data);
@@ -35,7 +39,7 @@ export default (urlValue, data = null, method = null) => {
         res.setEncoding("utf8");
         if (res.statusCode === 200) {
           const chunks = [];
-          res.on("data", chunk => chunks.push(chunk));
+          res.on("data", (chunk) => chunks.push(chunk));
           res.on("end", () => {
             // logger.info("body=", chunks);
             let params = null;

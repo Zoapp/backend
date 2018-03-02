@@ -44,7 +44,9 @@ class Users extends CommonRoutes {
 
   async me(context) {
     const { access } = context.res.locals;
-    const profile = await this.controller.getUsers().getProfile({ user: { id: access.user_id } });
+    const profile = await this.controller
+      .getUsers()
+      .getProfile({ user: { id: access.user_id } });
     return Users.profile(profile);
   }
 
