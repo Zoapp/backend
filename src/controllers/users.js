@@ -15,6 +15,7 @@ export default class extends AbstractController {
 
   async getProfile(params) {
     let profile = null;
+    // logger.info("getProfile=", params);
     if (params.user && params.user.provider) {
       const self = this;
       this.applyMiddleware("getUserProfile", params.user, async (result) => {
@@ -24,6 +25,7 @@ export default class extends AbstractController {
     } else if (params.user) {
       // make sure user.id is valid
       const user = await this.main.getUser(params.user.id);
+      // logger.info("user=", user);
       if (user) {
         profile = await this.model.createProfile(user);
       }
@@ -31,9 +33,16 @@ export default class extends AbstractController {
     }
 
     if (!profile && params.id) {
-      profile = this.model.getProfile(params.id);
+      profile = await this.model.getProfile(params.id);
+      if (!profile) {
+        const user = await this.main.getUser(params.id);
+        if (user) {
+          profile = await this.model.createProfile(user);
+        }
+      }
       // this.dispatch("updateUserProfile", profile);
     }
+
     return profile;
   }
 

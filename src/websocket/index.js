@@ -169,9 +169,9 @@ export class WSRouter {
     if (!event) {
       event = data.action;
     }
-    logger.info("data.event=", event, data.origin);
+    // logger.info("data.event=", event, data.origin);
     this.wss.clients.forEach((ws) => {
-      logger.info("ws=", ws.channelId, ws.route);
+      // logger.info("ws=", ws.channelId, ws.route);
       // TODO check route classname /event
       if (ws.channelId === data.origin) {
         const routeName = ws.route;
