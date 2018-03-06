@@ -31,9 +31,16 @@ export default class extends AbstractController {
     }
 
     if (!profile && params.id) {
-      profile = this.model.getProfile(params.id);
+      profile = await this.model.getProfile(params.id);
+      if (!profile) {
+        const user = await this.main.getUser(params.id);
+        if (user) {
+          profile = await this.model.createProfile(user);
+        }
+      }
       // this.dispatch("updateUserProfile", profile);
     }
+
     return profile;
   }
 
