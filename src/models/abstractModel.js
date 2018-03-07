@@ -41,10 +41,10 @@ export default class {
     return this.database.generateToken(length);
   }
 
-  async open() {
+  async open(buildSchema = true) {
     const ok = !!this.database;
     if (ok) {
-      await this.database.load();
+      await this.database.load(buildSchema);
     }
   }
 

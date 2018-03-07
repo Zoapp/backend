@@ -12,9 +12,9 @@ export default class {
     this.className = className;
   }
 
-  async open() {
+  async open(buildSchema = true) {
     if (this.model) {
-      await this.model.open();
+      await this.model.open(buildSchema);
     }
   }
 
