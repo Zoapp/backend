@@ -5,16 +5,16 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { setupLogger } from "zoapp-core";
-import ApiServer from "./server";
-import App from "./app";
+import createApiServer from "./server";
+import createApp from "./app";
 import Controller from "./controllers/abstractController";
 import Model from "./models/abstractModel";
 import CommonRoutes from "./routes/common";
 
-const Zoapp = (config, log = "debug") => {
+const createZoapp = (config, log = "debug") => {
   setupLogger(log);
-  const server = ApiServer(config);
-  const app = App(config, server);
+  const server = createApiServer(config);
+  const app = createApp(config, server);
 
   const shutdown = () => {
     const close = async () => {
@@ -32,4 +32,5 @@ const Zoapp = (config, log = "debug") => {
 };
 
 export { Controller, Model, CommonRoutes };
-export default Zoapp;
+
+export default createZoapp;

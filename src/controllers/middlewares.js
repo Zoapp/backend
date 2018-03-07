@@ -13,11 +13,14 @@ export default class extends AbstractController {
     super(name, main, className);
     this.model = new MiddlewareModel(main.database, main.config);
     this.middlewares = {};
+    this.buildSchema = main.config.buildSchema;
   }
 
   async open() {
-    await super.open();
+    await super.open(this.buildSchema);
+
     const mws = await this.model.getMiddlewares();
+
     if (mws) {
       mws.forEach((m) => {
         this.attachLocally(m);

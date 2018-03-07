@@ -15,7 +15,13 @@ class App {
   constructor(configuration = {}, server = null) {
     this.name = configuration.name || "Zoapp backend";
     this.version = configuration.version || "";
+    this.buildSchema =
+      configuration.buildSchema !== undefined
+        ? !!configuration.buildSchema
+        : true;
+
     logger.info(`Start ${this.name} ${this.version}`);
+
     const configEmpty = Object.keys(configuration).length === 0 ? {} : null;
     let globalDbConfig = null;
     if (
@@ -54,7 +60,11 @@ class App {
     this.authServer = zoauthServer(authConfig, server.app);
     this.authRouter = AuthRouter(this.authServer);
 
-    const cfg = { ...configuration };
+    const cfg = {
+      ...configuration,
+      buildSchema: this.buildSchema,
+    };
+
     if (!cfg.users) {
       cfg.users = {
         database: {
@@ -107,7 +117,7 @@ class App {
 
   async start() {
     if (this.database) {
-      await this.database.load();
+      await this.database.load(this.buildSchema);
     }
     if (this.authServer) {
       await this.authServer.start();

@@ -13,7 +13,7 @@ class MainController {
   constructor(zoapp, config) {
     this.zoapp = zoapp;
     this.authServer = zoapp.authServer;
-    this.config = config || {};
+    this.config = config || { buildSchema: true };
     this.database = zoapp.database;
     this.users = new UsersController("Users", this);
     this.middlewares = new MiddlewaresController("Middlewares", this, "system");
@@ -22,13 +22,16 @@ class MainController {
   }
 
   async start() {
-    await this.parameters.open();
-    await this.middlewares.open();
-    await this.admin.open();
-    await this.users.open();
+    const { buildSchema } = this.config;
+
+    await this.parameters.open(buildSchema);
+    await this.middlewares.open(buildSchema);
+    await this.admin.open(buildSchema);
+    await this.users.open(buildSchema);
   }
 
   async stop() {
+    await this.admin.close();
     await this.users.close();
     await this.middlewares.close();
     await this.parameters.close();
