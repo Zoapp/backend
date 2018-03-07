@@ -28,7 +28,7 @@ class LocalTunnel {
   }
 
   fireEvent(eventName) {
-    logger.info("LocalTunnel fireEvent", eventName);
+    // logger.info("LocalTunnel fireEvent", eventName);
     if (this.listener) {
       this.listener.fireEvent(eventName, this);
     }
