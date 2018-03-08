@@ -12,8 +12,10 @@ export default class {
     this.className = className;
   }
 
-  async open(buildSchema = true) {
+  async open() {
     if (this.model) {
+      const { buildSchema } = this.main.config;
+
       await this.model.open(buildSchema);
     }
   }
