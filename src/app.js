@@ -19,6 +19,8 @@ class App {
       configuration.buildSchema !== undefined
         ? !!configuration.buildSchema
         : true;
+    // eslint-disable-next-line no-param-reassign
+    delete configuration.buildSchema;
 
     logger.info(`Start ${this.name} ${this.version}`);
 
