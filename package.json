@@ -10,6 +10,7 @@
     "compile": "yarn compile:dev && rm -r -f ./dist/config.j* && rm -r -f ./dist/index.j* && mv ./dist/zoapp.js ./dist/index.js",
     "compile:dev": "yarn clean-dist && babel src -s -D -d dist && cp -f ./package.json ./dist/package.json && cp -f ./LICENSE ./dist/LICENSE && cp -f ./README.md ./dist/README.md",
     "dev": "yarn compile:dev && yarn start:dev",
+    "distribute:dev": "yarn compile && cd ./dist && yarn pack",
     "lint": "eslint src test",
     "start": "node dist",
     "start:dev": "nodemon -w src --exec \"babel-node src \"",
