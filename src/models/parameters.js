@@ -42,6 +42,11 @@ export default class extends AbstractModel {
     return collection.setItem(id, item);
   }
 
+  async deleteValue(name, type = null, collection = this.getInnerTable()) {
+    const query = `name=${name} AND type=${type}`;
+    return collection.deleteItem(query);
+  }
+
   async generateName(
     length = 4,
     type = null,
