@@ -4051,13 +4051,6 @@ yargs@3.29.0:
     window-size "^0.1.2"
     y18n "^3.2.0"
 
-zoapp-core@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/zoapp-core/-/zoapp-core-0.3.0.tgz#6e6ca5de1e929ed2f878ab4402d0396d7ec87dd8"
-  dependencies:
-    mysql2 "^1.5.1"
-    winston "2.4.0"
-
 zoapp-core@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/zoapp-core/-/zoapp-core-0.10.0.tgz#62b2c24e68f3dbd4e51799484c2ec7a0259c208c"
@@ -4065,10 +4058,17 @@ zoapp-core@^0.10.0:
     mysql2 "^1.5.1"
     winston "2.4.0"
 
-zoauth-server@0.3.3:
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/zoauth-server/-/zoauth-server-0.3.3.tgz#db9a67a95381582e3c6d44d5a2ad91e18c047661"
+zoapp-core@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/zoapp-core/-/zoapp-core-0.11.0.tgz#4c5ee942be88c4747cf093c33bafc42608fcc34a"
+  dependencies:
+    mysql2 "^1.5.1"
+    winston "2.4.0"
+
+zoauth-server@0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/zoauth-server/-/zoauth-server-0.5.0.tgz#b2c7bb5316476ac557ba8c551dd0f220abafb307"
   dependencies:
     body-parser "^1.17.2"
     express "^4.15.3"
-    zoapp-core "0.3.0"
+    zoapp-core "^0.10.0"

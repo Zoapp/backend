@@ -12,6 +12,10 @@ export default class extends AbstractModel {
     super("users", database, config, descriptor);
   }
 
+  async countAll(collection = this.getInnerTable()) {
+    return collection.size();
+  }
+
   async getProfile(id, profiles = this.getInnerTable("profiles")) {
     let profile = await profiles.getItem(id);
     if (!profile) {
