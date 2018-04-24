@@ -64,7 +64,7 @@ export default class extends AbstractController {
 
   async remove(middleware) {
     let ret = true;
-    const m = await this.zoapp.pluginManager.unregister(middleware);
+    const m = await this.zoapp.pluginsManager.unregister(middleware);
     const { id } = m;
     ret = await this.model.unregister(id);
     if (this.middlewares[id]) {
