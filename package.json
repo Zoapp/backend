@@ -14,7 +14,7 @@
     "lint": "eslint src test",
     "start": "node dist",
     "start:dev": "nodemon -w src --exec \"babel-node src \"",
-    "test": "./node_modules/.bin/mocha --compilers js:babel-core/register --exit"
+    "test": "mocha --compilers js:babel-core/register --exit --recursive"
   },
   "keywords": [
     "Node",
