@@ -28,7 +28,7 @@
     "node-fetch": "^2.1.2",
     "ws": "^3.3.3",
     "zoapp-core": "^0.12.1",
-    "zoauth-server": "0.5.0"
+    "zoauth-server": "^0.6.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
