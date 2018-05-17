@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import ApiError from "zoauth-server/Error/ApiError";
 import CommonRoutes from "./common";
 
 export default class extends CommonRoutes {
@@ -65,6 +66,11 @@ export default class extends CommonRoutes {
     if (type) {
       logger.info("TODO type parameters translate");
     }
+
+    if (value === null) {
+      throw new ApiError(404, `parameter with name ${name} does not exists`);
+    }
+
     return value;
   }
 
