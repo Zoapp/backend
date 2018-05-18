@@ -84,10 +84,5 @@ export default (zoapp) => {
     ["admin", "master", "application"],
     admin.getParameterValue,
   );
-  route.add(
-    "GET",
-    "/:name/:type",
-    ["admin", "master", "application"],
-    admin.getParameterValue,
-  );
+  route.add("GET", "/:name/:type", ["admin", "open"], admin.getParameterValue);
 };
