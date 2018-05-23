@@ -132,7 +132,7 @@ export default class extends AbstractController {
     return { params: parameters };
   }
 
-  async setParameters(clientId, parameters) {
+  async setParameters(me, clientId, parameters) {
     // TODO check errors
     if (parameters.tunnel) {
       let { tunnel } = parameters;
@@ -186,6 +186,6 @@ export default class extends AbstractController {
         .getParameters()
         .setValue("emailServer", parameters.emailServer);
     }
-    return this.getParameters(clientId, true);
+    return this.getParameters(me, clientId, true);
   }
 }

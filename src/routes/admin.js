@@ -36,14 +36,14 @@ export default class extends CommonRoutes {
 
   async updateAdmin(context) {
     // WIP
-    // const me = await this.access(context);
+    const me = await this.access(context);
     const scope = context.getScope();
     const clientId = context.getClientId();
     const isMaster = scope === "master";
     const isAdmin = isMaster || scope === "admin";
     if (isAdmin) {
       const params = context.getBody();
-      return this.controller.getAdmin().setParameters(clientId, params);
+      return this.controller.getAdmin().setParameters(me, clientId, params);
     }
     return { error: "no right to access" };
   }
