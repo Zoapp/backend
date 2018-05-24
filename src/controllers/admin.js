@@ -4,8 +4,11 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { createTransport } from "nodemailer";
+import validate from "validate.js";
 import AbstractController from "./abstractController";
 import TunnelProvider from "../utils/tunnelProvider";
+import emailConstraints from "../constraints/EmailParameters";
 
 export default class extends AbstractController {
   constructor(name, main, className) {
@@ -182,10 +185,35 @@ export default class extends AbstractController {
       }
       await this.main.getParameters().setValue("backend", parameters.backend);
     } else if (parameters.emailServer) {
-      await this.main
-        .getParameters()
-        .setValue("emailServer", parameters.emailServer);
+      await this.configureMail(parameters.emailServer);
     }
     return this.getParameters(me, clientId, true);
+  }
+
+  async configureMail(parameters) {
+    try {
+      await validate.async(parameters, emailConstraints);
+    } catch (error) {
+      throw new Error(error);
+    }
+
+    const smtpConfig = {
+      host: parameters.host,
+      port: parameters.port,
+      secure: true,
+      auth: {
+        user: parameters.username,
+        pass: parameters.password,
+      },
+    };
+
+    const transporter = createTransport(smtpConfig);
+    try {
+      await transporter.verify();
+    } catch (error) {
+      throw new Error("impossible to configure SMTP");
+    }
+
+    this.main.getParameters().setValue("emailServer", parameters);
   }
 }

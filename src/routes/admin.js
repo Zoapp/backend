@@ -43,7 +43,14 @@ export default class extends CommonRoutes {
     const isAdmin = isMaster || scope === "admin";
     if (isAdmin) {
       const params = context.getBody();
-      return this.controller.getAdmin().setParameters(me, clientId, params);
+      try {
+        const result = await this.controller
+          .getAdmin()
+          .setParameters(me, clientId, params);
+        return result;
+      } catch (error) {
+        throw new ApiError(400, error.message);
+      }
     }
     return { error: "no right to access" };
   }
