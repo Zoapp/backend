@@ -44,6 +44,25 @@ export default class extends AbstractController {
     return profile;
   }
 
+  async getUsers(excludedUser) {
+    const result = await this.main.authServer.getUsers();
+
+    return Promise.all(
+      result.filter((user) => user.id !== excludedUser.id).map(async (u) => {
+        const user = { ...u };
+        delete user.password;
+
+        const profile = await this.getProfile({ id: user.id });
+
+        if (profile) {
+          user.avatar = profile.avatar;
+        }
+
+        return user;
+      }),
+    );
+  }
+
   async storeProfile(profile) {
     const p = await this.model.storeProfile(profile);
     // callback(p);
