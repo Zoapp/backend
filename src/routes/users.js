@@ -58,8 +58,14 @@ class Users extends CommonRoutes {
   }
 
   async users(context) {
-    this.todo = {};
-    return { todo: `users.users route ${context.req.route.path}` };
+    const scope = context.getScope();
+
+    if (scope !== "admin") {
+      return [];
+    }
+
+    const me = await this.access(context);
+    return this.controller.getUsers().getUsers(me);
   }
 
   async newProfile(context) {
