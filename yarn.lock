@@ -4151,9 +4151,9 @@ zoapp-core@^0.12.1:
     mysql2 "^1.5.1"
     winston "2.4.0"
 
-zoauth-server@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/zoauth-server/-/zoauth-server-0.6.0.tgz#78c3d59795bc971dbcd6b620c37bec161a5f7f59"
+zoauth-server@0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/zoauth-server/-/zoauth-server-0.7.0.tgz#52788c1b763061f712959cc6b830998354f22387"
   dependencies:
     body-parser "^1.17.2"
     express "^4.15.3"
