@@ -4,9 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import fetch from "node-fetch";
 import AbstractController from "./abstractController";
 import MiddlewareModel from "../models/middlewares";
-import fetch from "../utils/fetch";
 
 export default class extends AbstractController {
   constructor(name, main, className) {
@@ -123,7 +123,14 @@ export default class extends AbstractController {
                 const url = `${m.url + m.path}?class=${encodeURIComponent(
                   className,
                 )}&secret=${encodeURIComponent(m.secret)}`;
-                ret = await fetch(url, data);
+
+                const response = await fetch(url, {
+                  method: "POST",
+                  body: JSON.stringify(data),
+                  headers: { "Content-Type": "application/json" },
+                });
+
+                ret = await response.json();
                 // logger.info("ret=" + ret);
               } else if (m.onDispatch) {
                 // logger.info("data.origin=", data.origin, origin);
