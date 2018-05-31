@@ -21,9 +21,11 @@ export default class extends AbstractController {
     const mws = await this.model.getMiddlewares();
 
     if (mws) {
-      mws.forEach((m) => {
-        this.attachLocally(m);
-      }, this);
+      Promise.all(
+        mws.map(async (m) => {
+          await this.attachLocally(m);
+        }, this),
+      );
     }
   }
 
@@ -52,9 +54,9 @@ export default class extends AbstractController {
     return this.attachLocally(m);
   }
 
-  attachLocally(m) {
+  async attachLocally(m) {
     this.middlewares[m.id] = m;
-    this.dispatch(
+    await this.dispatch(
       this.className,
       { action: "setMiddleware", m, origin: m.origin },
       m.id,
@@ -74,7 +76,7 @@ export default class extends AbstractController {
       ret = false;
     }
 
-    this.dispatch(
+    await this.dispatch(
       this.className,
       { action: "removeMiddleware", middleware, origin: middleware.origin },
       middleware.id,
