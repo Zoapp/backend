@@ -33,8 +33,8 @@ export default class {
     }
   }
 
-  dispatch(className, data, originId = null) {
-    this.zoapp.controllers
+  async dispatch(className, data, originId = null) {
+    return this.zoapp.controllers
       .getMiddlewares()
       .dispatchEvent(className, data, originId);
   }
