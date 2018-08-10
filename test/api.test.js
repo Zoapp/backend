@@ -153,29 +153,22 @@ const deleteAsync = async (context, route, token) => {
 };
 */
 
-const describeParams = (name, datasets, commonDatasets, func) => {
-  datasets.forEach((params) => {
-    describe(`${name} using ${params.title}`, () =>
-      func(params, commonDatasets));
-  });
-};
-
 let context = null;
+const commonDatasets = { password: "12345" };
 
-describeParams(
-  "API",
-  [{ title: "MemDataset" }, { title: "MySQLDataset", config: mysqlConfig }],
-  { password: "12345" },
-  (params, commons) => {
-    before(async () => {
-      context = await initService({}, params, commons);
+[
+  { title: "MemDataset" },
+  { title: "MySQLDataset", config: mysqlConfig },
+].forEach((param) => {
+  describe(`API using ${param.title}`, () => {
+    beforeAll(async () => {
+      context = await initService({}, param, commonDatasets);
     });
 
-    after(async () => {
+    afterAll(async () => {
       await context.app.database.delete();
       await context.app.close();
     });
-
     describe("/", () => {
       it("should return send infos on / GET", async () => {
         const res = await getAsync(context, "/");
@@ -203,7 +196,7 @@ describeParams(
           "email",
         ]);
       });
-      it("should list users on /users GET"); // TODO
+      // it("should list users on /users GET"); // TODO
       it("should get a SINGLE user on /users/:id GET", async () => {
         const res = await getAsync(
           context,
@@ -213,13 +206,13 @@ describeParams(
         // WIP
         expect(res).to.have.all.keys(["id", "username", "avatar", "email"]);
       });
-      it("should create a SINGLE user on /users POST"); // TODO
-      it("should update a SINGLE user on /users/<id> PUT"); // TODO
-      it("should delete a SINGLE user on /users/<id> DELETE"); // TODO
+      // it("should create a SINGLE user on /users POST"); // TODO
+      // it("should update a SINGLE user on /users/<id> PUT"); // TODO
+      // it("should delete a SINGLE user on /users/<id> DELETE"); // TODO
     });
 
     describe("/admin", () => {
-      it("should get admin infos /admin GET");
+      // it("should get admin infos /admin GET");
     });
 
     // TODO middlewares
@@ -251,5 +244,5 @@ describeParams(
     });
     it("should test webhook /webhooks/:id/test/:action POST");
   }); */
-  },
-);
+  });
+});
