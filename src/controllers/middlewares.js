@@ -35,6 +35,14 @@ export default class extends AbstractController {
     this.middlewares = {};
   }
 
+  /**
+   * Add middleware on the middlewares list.
+   *
+   * Remove existing middleware with same ID if needed.
+   * Call register on pluginManager and model.
+   * Call attachLocally(m).
+   * @param {middleware properties object} middleware
+   */
   async attach(middleware) {
     // logger.info("attach middleware=", middleware);
     let { id } = middleware; // || this.model.generateId(48);
@@ -54,6 +62,11 @@ export default class extends AbstractController {
     return this.attachLocally(m);
   }
 
+  /**
+   * Add middleware on the middlewares list.
+   * Dispatch a "setMiddleware" action.
+   * @param {middleware properties object} m
+   */
   async attachLocally(m) {
     this.middlewares[m.id] = m;
     await this.dispatch(

@@ -7,7 +7,7 @@
         "browser": false,
         "es6": true,
         "jquery": false,
-        "mocha": true,
+        "jest": true,
         "node": true
     },
     "globals": {
