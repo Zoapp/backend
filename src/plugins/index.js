@@ -51,7 +51,7 @@ class PluginsManager {
   /**
    * Register a middleware.
    * If there is a plugin with the same name has the middleware, it will call his register(middleware) method.
-   * @param {middleware properties object} middleware
+   * @param {Object} middleware - middleware properties object
    */
   async register(middleware) {
     // WIP

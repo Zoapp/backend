@@ -9,11 +9,21 @@ import MiddlewaresController from "./middlewares";
 import AdminController from "./admin";
 import Parameters from "../models/parameters";
 
+/**
+ * Class managing the controllers.
+ */
 class MainController {
-  constructor(zoapp, config) {
+  /**
+   *
+   * Create a MainController.
+   * Create and store the controllers (UsersController, MiddlewaresController etc)
+   * @param {App} zoapp - The App instance.
+   * @param {Object} [config={}] - The application configuration
+   */
+  constructor(zoapp, config = {}) {
     this.zoapp = zoapp;
     this.authServer = zoapp.authServer;
-    this.config = config || {};
+    this.config = config;
     this.database = zoapp.database;
 
     this.users = new UsersController("Users", this);
