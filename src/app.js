@@ -43,7 +43,7 @@ export class App {
 
     const globalDbConfig = App.buildDbConfig(configuration);
     if (globalDbConfig) {
-      this.database = dbCreate(globalDbConfig);
+      this.database = App.dbCreate(globalDbConfig);
       // logger.info("db",this.database);
     }
     // authConfig
@@ -66,6 +66,14 @@ export class App {
     this.pluginsManager = PluginsManager(this, cfg);
     this.wsRouter = WSRouterBuilder(this);
     RouteBuilder(this);
+  }
+
+  /**
+   * Proxy function between App.constructor and zoapp-core. Make unit tests easier.
+   * @param {Object} globalDbConfig
+   */
+  static dbCreate(globalDbConfig) {
+    return dbCreate(globalDbConfig);
   }
 
   static buildDbConfig(configuration) {
@@ -92,35 +100,32 @@ export class App {
   }
 
   static buildConfig(configuration, buildSchema) {
-    const cfg = {
-      ...configuration,
-      buildSchema,
-    };
-
-    if (!cfg.users) {
-      cfg.users = {
+    const defaultCfg = {
+      users: {
         database: {
           parent: "global",
           name: "users",
         },
-      };
-    }
-    if (!cfg.middlewares) {
-      cfg.middlewares = {
+      },
+      middlewares: {
         database: {
           parent: "global",
           name: "middlewares",
         },
-      };
-    }
-    if (!cfg.parameters) {
-      cfg.parameters = {
+      },
+      parameters: {
         database: {
           parent: "global",
           name: "parameters",
         },
-      };
-    }
+      },
+    };
+    const cfg = {
+      ...defaultCfg,
+      ...configuration,
+      buildSchema,
+    };
+
     return cfg;
   }
 
