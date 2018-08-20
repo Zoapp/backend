@@ -11,10 +11,27 @@ import RouteBuilder from "./routes";
 import WSRouterBuilder from "./websocket";
 import PluginsManager from "./plugins";
 
-class App {
+export const defaultAuthConfig = {
+  database: {
+    parent: "global",
+    name: "auth",
+  },
+  api: {
+    endpoint: "/auth",
+  },
+};
+
+export class App {
   constructor(configuration = {}, server = null) {
-    this.name = configuration.name || "Zoapp backend";
-    this.version = configuration.version || "";
+    const defaultConfig = {
+      name: "Zoapp backend",
+      version: "",
+    };
+    this.config = {
+      ...defaultConfig,
+      ...configuration, // params configuration overide the default configuration
+    };
+
     this.buildSchema =
       configuration.buildSchema !== undefined
         ? !!configuration.buildSchema
@@ -24,32 +41,13 @@ class App {
 
     logger.info(`Start ${this.name} ${this.version}`);
 
-    const configEmpty = Object.keys(configuration).length === 0 ? {} : null;
-    let globalDbConfig = null;
-    if (
-      (configuration.global && configuration.global.database) ||
-      configEmpty
-    ) {
-      globalDbConfig = configEmpty || configuration.global.database;
-    }
+    const globalDbConfig = App.buildDbConfig(configuration);
     if (globalDbConfig) {
       this.database = dbCreate(globalDbConfig);
       // logger.info("db",this.database);
     }
-    let authConfig = {};
-    if (configuration.auth) {
-      authConfig = { ...configuration.auth };
-    } else {
-      authConfig = {
-        database: {
-          parent: "global",
-          name: "auth",
-        },
-        api: {
-          endpoint: "/auth",
-        },
-      };
-    }
+    // authConfig
+    const authConfig = App.buildAuthConfig(configuration);
     if (this.database && authConfig.database.parent === "global") {
       authConfig.database.parent = this.database;
     }
@@ -62,9 +60,41 @@ class App {
     this.authServer = zoauthServer(authConfig, server.app);
     this.authRouter = AuthRouter(this.authServer);
 
+    const cfg = App.buildConfig(configuration, this.buildSchema);
+
+    this.controllers = Controllers(this, cfg);
+    this.pluginsManager = PluginsManager(this, cfg);
+    this.wsRouter = WSRouterBuilder(this);
+    RouteBuilder(this);
+  }
+
+  static buildDbConfig(configuration) {
+    const configEmpty = Object.keys(configuration).length === 0 ? {} : null;
+    // database
+    let globalDbConfig = null;
+    if (
+      (configuration.global && configuration.global.database) ||
+      configEmpty
+    ) {
+      globalDbConfig = configEmpty || configuration.global.database;
+    }
+    return globalDbConfig;
+  }
+
+  static buildAuthConfig(configuration) {
+    let authConfig = {};
+    if (configuration.auth) {
+      authConfig = { ...configuration.auth };
+    } else {
+      authConfig = { ...defaultAuthConfig };
+    }
+    return authConfig;
+  }
+
+  static buildConfig(configuration, buildSchema) {
     const cfg = {
       ...configuration,
-      buildSchema: this.buildSchema,
+      buildSchema,
     };
 
     if (!cfg.users) {
@@ -91,10 +121,7 @@ class App {
         },
       };
     }
-    this.controllers = Controllers(this, cfg);
-    this.pluginsManager = PluginsManager(this, cfg);
-    this.wsRouter = WSRouterBuilder(this);
-    RouteBuilder(this);
+    return cfg;
   }
 
   createRoute(path) {

@@ -8,7 +8,7 @@ import { setupLogger } from "zoapp-core";
 import chai from "chai";
 import chaiHttp from "chai-http";
 import ApiServer from "../src/server";
-import App from "../src/app";
+import AppFunc from "../src/app";
 
 const { expect } = chai;
 
@@ -46,7 +46,7 @@ const initService = async (ctx, params, commons) => {
   }
   // logger.info("config=", config);
   const apiServer = ApiServer(config);
-  const app = App(config, apiServer);
+  const app = AppFunc(config, apiServer);
   await app.database.reset();
   await app.start();
   context.app = app;
