@@ -10,6 +10,8 @@ import chaiHttp from "chai-http";
 import ApiServer from "../src/server";
 import AppFunc from "../src/app";
 
+import defaultAppConfig from "../src/defaultAppConfig";
+
 const { expect } = chai;
 
 chai.use(chaiHttp);
@@ -18,6 +20,7 @@ setupLogger("test");
 
 const mysqlConfig = {
   // Global Database
+  ...defaultAppConfig,
   global: {
     database: {
       datatype: "mysql",
@@ -26,6 +29,20 @@ const mysqlConfig = {
       user: "root",
       charset: "utf8mb4",
       version: "2",
+    },
+    api: {
+      endpoint: "/api",
+      version: "1",
+      port: 8085,
+    },
+  },
+};
+
+const memDBConfig = {
+  ...defaultAppConfig,
+  global: {
+    database: {
+      datatype: "memDatabase",
     },
     api: {
       endpoint: "/api",
@@ -157,7 +174,7 @@ let context = null;
 const commonDatasets = { password: "12345" };
 
 [
-  { title: "MemDataset" },
+  { title: "MemDataset", config: memDBConfig },
   { title: "MySQLDataset", config: mysqlConfig },
 ].forEach((param) => {
   describe(`API using ${param.title}`, () => {

@@ -52,6 +52,7 @@
   },
   "jest": {
     "testURL": "http://localhost",
-    "verbose": true
+    "verbose": true,
+    "setupTestFrameworkScriptFile": "<rootDir>/test/setupTests.js"
   }
 }
