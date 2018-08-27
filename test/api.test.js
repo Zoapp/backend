@@ -8,7 +8,9 @@ import { setupLogger } from "zoapp-core";
 import chai from "chai";
 import chaiHttp from "chai-http";
 import ApiServer from "../src/server";
-import App from "../src/app";
+import AppFunc from "../src/app";
+
+import defaultAppConfig from "../src/defaultAppConfig";
 
 const { expect } = chai;
 
@@ -18,6 +20,7 @@ setupLogger("test");
 
 const mysqlConfig = {
   // Global Database
+  ...defaultAppConfig,
   global: {
     database: {
       datatype: "mysql",
@@ -26,6 +29,20 @@ const mysqlConfig = {
       user: "root",
       charset: "utf8mb4",
       version: "2",
+    },
+    api: {
+      endpoint: "/api",
+      version: "1",
+      port: 8085,
+    },
+  },
+};
+
+const memDBConfig = {
+  ...defaultAppConfig,
+  global: {
+    database: {
+      datatype: "memDatabase",
     },
     api: {
       endpoint: "/api",
@@ -46,7 +63,7 @@ const initService = async (ctx, params, commons) => {
   }
   // logger.info("config=", config);
   const apiServer = ApiServer(config);
-  const app = App(config, apiServer);
+  const app = AppFunc(config, apiServer);
   await app.database.reset();
   await app.start();
   context.app = app;
@@ -157,7 +174,7 @@ let context = null;
 const commonDatasets = { password: "12345" };
 
 [
-  { title: "MemDataset" },
+  { title: "MemDataset", config: memDBConfig },
   { title: "MySQLDataset", config: mysqlConfig },
 ].forEach((param) => {
   describe(`API using ${param.title}`, () => {

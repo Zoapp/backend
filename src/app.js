@@ -11,90 +11,108 @@ import RouteBuilder from "./routes";
 import WSRouterBuilder from "./websocket";
 import PluginsManager from "./plugins";
 
-class App {
-  constructor(configuration = {}, server = null) {
-    this.name = configuration.name || "Zoapp backend";
-    this.version = configuration.version || "";
-    this.buildSchema =
-      configuration.buildSchema !== undefined
-        ? !!configuration.buildSchema
-        : true;
-    // eslint-disable-next-line no-param-reassign
-    delete configuration.buildSchema;
+export class App {
+  constructor(configuration, server = null) {
+    this.configuration = { ...configuration };
 
     logger.info(`Start ${this.name} ${this.version}`);
 
-    const configEmpty = Object.keys(configuration).length === 0 ? {} : null;
-    let globalDbConfig = null;
-    if (
-      (configuration.global && configuration.global.database) ||
-      configEmpty
-    ) {
-      globalDbConfig = configEmpty || configuration.global.database;
-    }
-    if (globalDbConfig) {
-      this.database = dbCreate(globalDbConfig);
-      // logger.info("db",this.database);
-    }
-    let authConfig = {};
-    if (configuration.auth) {
-      authConfig = { ...configuration.auth };
-    } else {
-      authConfig = {
-        database: {
-          parent: "global",
-          name: "auth",
-        },
-        api: {
-          endpoint: "/auth",
-        },
-      };
-    }
-    if (this.database && authConfig.database.parent === "global") {
-      authConfig.database.parent = this.database;
-    }
+    // create Database
+    this.database = App.createDB(this.configuration);
 
-    const endpoint = "/api/v1";
-    const conf = configuration.api || { endpoint };
-    this.endpoint = conf.endpoint || endpoint;
+    // build authConfig
+    const authConfig = App.buildAuthConfig(this.configuration, this.database);
+
+    // build endpoint
+    this.endpoint = App.buildAPIEndpoint(this.configuration);
 
     this.server = server;
-    this.authServer = zoauthServer(authConfig, server.app);
+    this.authServer = App.zoauthServer(authConfig, server.app);
     this.authRouter = AuthRouter(this.authServer);
 
-    const cfg = {
-      ...configuration,
-      buildSchema: this.buildSchema,
-    };
-
-    if (!cfg.users) {
-      cfg.users = {
-        database: {
-          parent: "global",
-          name: "users",
-        },
-      };
-    }
-    if (!cfg.middlewares) {
-      cfg.middlewares = {
-        database: {
-          parent: "global",
-          name: "middlewares",
-        },
-      };
-    }
-    if (!cfg.parameters) {
-      cfg.parameters = {
-        database: {
-          parent: "global",
-          name: "parameters",
-        },
-      };
-    }
-    this.controllers = Controllers(this, cfg);
-    this.pluginsManager = PluginsManager(this, cfg);
+    this.controllers = App.createMainControllers(this, this.configuration);
+    this.pluginsManager = PluginsManager(this, this.configuration);
     this.wsRouter = WSRouterBuilder(this);
     RouteBuilder(this);
+  }
+
+  get name() {
+    return this.configuration.name;
+  }
+
+  get version() {
+    return this.configuration.version;
+  }
+
+  get buildSchema() {
+    return this.configuration.buildSchema;
+  }
+
+  /**
+   * Private proxy function between App.constructor and zoauth-server. Make unit tests easier.
+   */
+  static zoauthServer(authConfig, serverApp) {
+    return zoauthServer(authConfig, serverApp);
+  }
+
+  /**
+   * Private proxy function. Make unit tests easier
+   * @param {Object} app - App instance
+   * @param {Object} configuration - Application configuration
+   */
+  static createMainControllers(app, configuration) {
+    return Controllers(app, configuration);
+  }
+
+  static createDB(appConfiguration) {
+    let database;
+    if (appConfiguration.global && appConfiguration.global.database) {
+      database = dbCreate({ ...appConfiguration.global.database });
+      // logger.info("db",this.database);
+    } else {
+      throw new Error(
+        "ConfigurationError: global database configuration not found",
+      );
+    }
+    return database;
+  }
+
+  static buildAuthConfig(appConfiguration, database) {
+    let authConfig = {};
+    if (appConfiguration.auth) {
+      authConfig = { ...appConfiguration.auth };
+      if (database && authConfig.database.parent === "global") {
+        authConfig.database.parent = database;
+      }
+    } else {
+      throw new Error("ConfigurationError: auth configuration not found");
+    }
+
+    return authConfig;
+  }
+
+  /**
+   * build the API endpoint path. Concat Api endpoint and Api version.
+   * @param {object} appConfiguration -  application configuration
+   */
+  static buildAPIEndpoint(appConfiguration) {
+    let endpoint = "";
+    if (
+      appConfiguration &&
+      appConfiguration.global &&
+      appConfiguration.global.api &&
+      appConfiguration.global.api.endpoint &&
+      appConfiguration.global.api.version
+    ) {
+      endpoint = `${appConfiguration.global.api.endpoint}/v${
+        appConfiguration.global.api.version
+      }`;
+    } else {
+      throw new Error(
+        "ConfigurationError: global api endpoint configuration not found",
+      );
+    }
+    return endpoint;
   }
 
   createRoute(path) {

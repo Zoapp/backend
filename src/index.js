@@ -5,6 +5,22 @@
  * LICENSE file in the root directory of this source tree.
  */
 import createZoapp from "./zoapp";
-import Config from "./config";
+import defaultAppConfig from "./defaultAppConfig";
 
-createZoapp(Config()).start();
+const fs = require("fs");
+
+// load config/default.json configuration if present.
+let userConfig = {};
+try {
+  userConfig = JSON.parse(fs.readFileSync("config/default.json"));
+} catch (error) {
+  logger.info("No config/default.json file provided");
+}
+
+// merge default and user configuration
+const config = {
+  ...defaultAppConfig,
+  ...userConfig, // overide with userConfig data
+};
+
+createZoapp(config).start();

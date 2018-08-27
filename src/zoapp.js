@@ -10,6 +10,7 @@ import createApp from "./app";
 import Controller from "./controllers/abstractController";
 import Model from "./models/abstractModel";
 import CommonRoutes from "./routes/common";
+import defaultAppConfig from "./defaultAppConfig";
 
 const createZoapp = (config, log = "debug") => {
   setupLogger(log);
@@ -31,6 +32,6 @@ const createZoapp = (config, log = "debug") => {
   return app;
 };
 
-export { Controller, Model, CommonRoutes };
+export { Controller, Model, CommonRoutes, defaultAppConfig };
 
 export default createZoapp;

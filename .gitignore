@@ -3,6 +3,6 @@ dist
 lib
 *.DS_Store
 config
-*config.js
 src/config.js
 yarn.lock
+.vscode

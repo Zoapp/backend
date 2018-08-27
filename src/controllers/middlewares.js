@@ -8,13 +8,27 @@ import fetch from "node-fetch";
 import AbstractController from "./abstractController";
 import MiddlewareModel from "../models/middlewares";
 
-export default class extends AbstractController {
+/**
+ * Class representing a middlewares controller
+ */
+class MiddlewaresController extends AbstractController {
+  /**
+   * Create a middlewares controller.
+   * Create and store an instance of MiddlewareModel
+   * Create an empty middlewares "list"
+   * @param {string} name - The name of the controller. //Not used
+   * @param {Object} main - The MainController instance.
+   * @param {string} className
+   */
   constructor(name, main, className) {
     super(name, main, className);
     this.model = new MiddlewareModel(main.database, main.config);
     this.middlewares = {};
   }
 
+  /**
+   * Get the list of middlewares from the DB and add them to the local middlewares list.
+   */
   async open() {
     await super.open();
 
@@ -29,12 +43,23 @@ export default class extends AbstractController {
     }
   }
 
+  /**
+   * Close the model and reset the middlewares list
+   */
   async close() {
     super.close();
     // TODO send a close to all middlewares
     this.middlewares = {};
   }
 
+  /**
+   * Add middleware on the middlewares list.
+   *
+   * Remove existing middleware with same ID if needed.
+   * Call register on pluginManager and model.
+   * Call attachLocally(m).
+   * @param {Object} middleware - middleware properties object
+   */
   async attach(middleware) {
     // logger.info("attach middleware=", middleware);
     let { id } = middleware; // || this.model.generateId(48);
@@ -54,6 +79,11 @@ export default class extends AbstractController {
     return this.attachLocally(m);
   }
 
+  /**
+   * Add middleware on the middlewares list.
+   * Dispatch a "setMiddleware" action.
+   * @param {Object} m - middleware properties object
+   */
   async attachLocally(m) {
     this.middlewares[m.id] = m;
     await this.dispatch(
@@ -64,10 +94,17 @@ export default class extends AbstractController {
     return m;
   }
 
+  /**
+   * Remove a middleware.
+   * Call Unregister on plugin manager.
+   * Dispatch a "removeMiddleware" action.
+   * @param {?} middleware
+   */
   async remove(middleware) {
     let ret = true;
     const m = await this.zoapp.pluginsManager.unregister(middleware);
     const { id } = m;
+    // Remove the middleware from the DB.
     ret = await this.model.unregister(id);
     if (this.middlewares[id]) {
       // remove middleware
@@ -188,3 +225,5 @@ export default class extends AbstractController {
     return w;
   }
 }
+
+export default MiddlewaresController;
