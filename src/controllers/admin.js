@@ -73,6 +73,15 @@ export default class extends AbstractController {
         this.zoapp.pluginsManager,
       );
     }
+
+    // Override with env variables.
+    parameters.backend.publicUrl =
+      process.env.ZOAPP_PUBLIC_URL || parameters.backend.publicUrl;
+    parameters.backend.apiUrl =
+      process.env.ZOAPP_API_URL || parameters.backend.apiUrl;
+    parameters.backend.authUrl =
+      process.env.ZOAPP_AUTH_URL || parameters.backend.authUrl;
+
     if (!parameters.backend.publicUrl) {
       logger.info("tunnel.active=", parameters.backend.tunnel.active);
       if (parameters.backend.tunnel.active) {

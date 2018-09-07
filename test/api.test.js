@@ -53,7 +53,7 @@ const memDBConfig = {
 };
 
 // init : create app / users / auth / token
-const initService = async (ctx, params, commons) => {
+const initService = async (ctx, params, commons, envs) => {
   const context = ctx;
   let config = {};
   if (params.config) {
@@ -61,6 +61,10 @@ const initService = async (ctx, params, commons) => {
   } else if (commons.config) {
     ({ config } = commons);
   }
+  process.env = {
+    ...process.env,
+    ...envs,
+  };
   // logger.info("config=", config);
   const apiServer = ApiServer(config);
   const app = AppFunc(config, apiServer);
@@ -261,5 +265,38 @@ const commonDatasets = { password: "12345" };
     });
     it("should test webhook /webhooks/:id/test/:action POST");
   }); */
+  });
+});
+
+describe("API env variables", () => {
+  const param = { config: memDBConfig };
+
+  describe("/admin", () => {
+    it("should return correct params on /admin GET", async () => {
+      context = await initService({}, param, commonDatasets, {
+        ZOAPP_PUBLIC_URL: "https://my.opla.domain/public_api",
+        ZOAPP_API_URL: "https://my.opla.domain/api",
+        ZOAPP_AUTH_URL: "https://my.opla.domain/auth",
+      });
+      const res = await getAsync(
+        context,
+        "/admin",
+        context.authUser1.access_token,
+      );
+      expect(res).to.nested.include({
+        "params.backend.publicUrl": "https://my.opla.domain/public_api",
+      });
+      expect(res).to.nested.include({
+        "params.backend.apiUrl": "https://my.opla.domain/api",
+      });
+      expect(res).to.nested.include({
+        "params.backend.authUrl": "https://my.opla.domain/auth",
+      });
+    });
+  });
+
+  afterAll(async () => {
+    await context.app.database.delete();
+    await context.app.close();
   });
 });
