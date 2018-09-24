@@ -192,6 +192,18 @@ class MiddlewaresController extends AbstractController {
     return ret;
   }
 
+  /**
+   * Get middlewares list filtered by param function
+   * @param {function} filterFunction
+   */
+  getMiddlewaresBy(filterFunction) {
+    return Object.values(this.middlewares).filter(filterFunction);
+  }
+
+  getMiddlewaresByName(name) {
+    return this.getMiddlewaresBy((middleware) => middleware.name === name);
+  }
+
   getMiddlewareById(id) {
     return this.middlewares[id];
   }
