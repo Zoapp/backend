@@ -81,6 +81,15 @@ export class WSRouter {
     this.middleware = middlewares.length > 0 ? middlewares[0] : null;
   }
 
+  createMiddleware(classes = ["messenger"]) {
+    return {
+      name: "websocket",
+      classes,
+      status: "start",
+      onDispatch: this.onDispatch.bind(this),
+    };
+  }
+
   attachMiddleware(middleware) {
     this.app.controllers
       .getMiddlewares()
@@ -90,22 +99,41 @@ export class WSRouter {
       });
   }
 
+  // check if classes1 contains all classes2 items
+  static areClassesIncluded(classes1, classes2) {
+    return classes2.every((element) => {
+      if (classes1.includes(element)) {
+        return true;
+      }
+      return false;
+    });
+  }
+
   addMiddlewareRoute(route) {
-    let { classes } = route;
-    if (this.middleware && this.middleware.classes) {
-      classes = [...new Set([...classes, ...this.middleware.classes])];
-      logger.info("WIP merge WS middleware", classes, this.middleware);
+    const { classes } = route;
+    let shouldUpdateMiddleware = false;
+
+    // if middleware doesnt exist create a new one
+    if (!this.middleware) {
+      this.middleware = this.createMiddleware(classes);
+      shouldUpdateMiddleware = true;
     }
-    const onDispatch = this.onDispatch.bind(this);
-    const middleware = this.middleware
-      ? { ...this.middleware, classes }
-      : {
-          name: "websocket",
-          classes,
-          status: "start",
-          onDispatch,
-        };
-    this.attachMiddleware(middleware);
+
+    // if route.classes not present in middleware.classes -> merge classes
+    if (
+      this.middleware.classes &&
+      classes &&
+      !WSRouter.areClassesIncluded(this.middleware.classes, classes)
+    ) {
+      this.middleware.classes = [
+        ...new Set([...classes, ...this.middleware.classes]),
+      ];
+      shouldUpdateMiddleware = true;
+    }
+
+    if (shouldUpdateMiddleware) {
+      this.attachMiddleware(this.middleware);
+    }
   }
 
   static setChannel(ws, token, routeName, channelId = null) {
