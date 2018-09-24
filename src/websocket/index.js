@@ -17,6 +17,8 @@ export class WSRouter {
   }
 
   start() {
+    this.loadExistingMiddleware();
+
     const that = this;
     this.wss.on("connection", (ws, req) => {
       that.startClient(ws, req).then();
@@ -65,6 +67,29 @@ export class WSRouter {
     });
   }
 
+  loadExistingMiddleware() {
+    // if a websocket middleware already exist, use it
+    const middlewares = this.app.controllers
+      .getMiddlewares()
+      .getMiddlewaresByName("websocket");
+    logger.warn("existing websocket middlewares ", middlewares);
+    // if websocket middleware found
+    if (middlewares.length > 0) {
+      this.middleware = middlewares[0]; // eslint-disable-line
+      this.middleware.onDispatch = this.onDispatch.bind(this);
+    }
+    this.middleware = middlewares.length > 0 ? middlewares[0] : null;
+  }
+
+  attachMiddleware(middleware) {
+    this.app.controllers
+      .getMiddlewares()
+      .attach(middleware)
+      .then((m) => {
+        this.middleware = m;
+      });
+  }
+
   addMiddlewareRoute(route) {
     let { classes } = route;
     if (this.middleware && this.middleware.classes) {
@@ -80,12 +105,7 @@ export class WSRouter {
           status: "start",
           onDispatch,
         };
-    this.app.controllers
-      .getMiddlewares()
-      .attach(middleware)
-      .then((m) => {
-        this.middleware = m;
-      });
+    this.attachMiddleware(middleware);
   }
 
   static setChannel(ws, token, routeName, channelId = null) {

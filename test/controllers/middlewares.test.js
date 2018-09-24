@@ -5,7 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 // import chai from "chai";
+import { setupLogger } from "zoapp-core";
 import MiddlewaresController from "../../src/controllers/middlewares";
+
+setupLogger("test");
 
 jest.mock("../../src/models/middlewares");
 
