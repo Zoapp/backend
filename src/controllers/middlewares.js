@@ -204,7 +204,7 @@ class MiddlewaresController extends AbstractController {
   }
 
   async list(origin = null, type = null) {
-    const list = await this.model.getMiddlewares(origin, type);
+    const list = await this.model.getMiddlewares({ origin, type });
     return list || [];
   }
 

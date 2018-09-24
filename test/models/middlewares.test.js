@@ -29,16 +29,20 @@ describe("models - middlewares", () => {
       expect(getItemsSpy).toHaveBeenCalledWith(null);
     });
     it("should get middleware by origin", () => {
-      middlewaresModel.getMiddlewares("abc", null);
+      middlewaresModel.getMiddlewares({ origin: "abc" });
       expect(getItemsSpy).toHaveBeenCalledWith("origin=abc");
     });
     it("should get middleware by type", () => {
-      middlewaresModel.getMiddlewares(null, "messenger");
+      middlewaresModel.getMiddlewares({ type: "messenger" });
       expect(getItemsSpy).toHaveBeenCalledWith("type=messenger");
     });
     it("should get middleware by origin and type", () => {
-      middlewaresModel.getMiddlewares("abc", "messenger");
+      middlewaresModel.getMiddlewares({ origin: "abc", type: "messenger" });
       expect(getItemsSpy).toHaveBeenCalledWith("origin=abc AND type=messenger");
+    });
+    it("should get middleware by name", () => {
+      middlewaresModel.getMiddlewares({ name: "websocket" });
+      expect(getItemsSpy).toHaveBeenCalledWith("name=websocket");
     });
   });
 });
