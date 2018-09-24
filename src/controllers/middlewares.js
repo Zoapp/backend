@@ -106,12 +106,8 @@ class MiddlewaresController extends AbstractController {
     const { id } = m;
     // Remove the middleware from the DB.
     ret = await this.model.unregister(id);
-    if (this.middlewares[id]) {
-      // remove middleware
-      delete this.middlewares[id];
-    } else {
-      ret = false;
-    }
+    // Remove the middleware loccaly
+    ret = this.removeLocally(id);
 
     await this.dispatch(
       this.className,
@@ -119,6 +115,15 @@ class MiddlewaresController extends AbstractController {
       middleware.id,
     );
     return ret;
+  }
+
+  removeLocally(middlewareId) {
+    if (this.middlewares[middlewareId]) {
+      // remove middleware
+      delete this.middlewares[middlewareId];
+      return true;
+    }
+    return false;
   }
 
   async call(className, action, parameters, name = null) {

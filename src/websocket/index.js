@@ -67,21 +67,22 @@ export class WSRouter {
 
   addMiddlewareRoute(route) {
     let { classes } = route;
-    if (this.middleware) {
-      if (this.middleware.classes) {
-        classes = [...new Set([...classes, ...this.middleware.classes])];
-      }
+    if (this.middleware && this.middleware.classes) {
+      classes = [...new Set([...classes, ...this.middleware.classes])];
       logger.info("WIP merge WS middleware", classes, this.middleware);
     }
     const onDispatch = this.onDispatch.bind(this);
+    const middleware = this.middleware
+      ? { ...this.middleware, classes }
+      : {
+          name: "websocket",
+          classes,
+          status: "start",
+          onDispatch,
+        };
     this.app.controllers
       .getMiddlewares()
-      .attach({
-        name: "websocket",
-        classes,
-        status: "start",
-        onDispatch,
-      })
+      .attach(middleware)
       .then((m) => {
         this.middleware = m;
       });
