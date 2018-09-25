@@ -12,13 +12,20 @@ export default class extends AbstractModel {
     super("middlewares", database, config, descriptor);
   }
 
-  async getMiddlewares(origin = null, type = null) {
-    const collection = this.getInnerTable();
-    let query = origin ? `origin=${origin}` : null;
-    if (type) {
-      query = query ? `${query} AND ` : "";
-      query += `type=${type}`;
+  /**
+   * @param {object} options - filter options
+   */
+  async getMiddlewares(options = {}) {
+    let query = null;
+
+    const keys = Object.keys(options);
+    // if options not empty
+    if (keys.length > 0) {
+      const keyValueTuples = keys.map((key) => `${key}=${options[key]}`);
+      query = keyValueTuples.join(" AND ");
     }
+
+    const collection = this.getInnerTable();
     return collection.getItems(query);
   }
 

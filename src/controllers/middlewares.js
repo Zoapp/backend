@@ -106,12 +106,8 @@ class MiddlewaresController extends AbstractController {
     const { id } = m;
     // Remove the middleware from the DB.
     ret = await this.model.unregister(id);
-    if (this.middlewares[id]) {
-      // remove middleware
-      delete this.middlewares[id];
-    } else {
-      ret = false;
-    }
+    // Remove the middleware loccaly
+    ret = this.removeLocally(id);
 
     await this.dispatch(
       this.className,
@@ -119,6 +115,15 @@ class MiddlewaresController extends AbstractController {
       middleware.id,
     );
     return ret;
+  }
+
+  removeLocally(middlewareId) {
+    if (this.middlewares[middlewareId]) {
+      // remove middleware
+      delete this.middlewares[middlewareId];
+      return true;
+    }
+    return false;
   }
 
   async call(className, action, parameters, name = null) {
@@ -187,6 +192,18 @@ class MiddlewaresController extends AbstractController {
     return ret;
   }
 
+  /**
+   * Get middlewares list filtered by param function
+   * @param {function} filterFunction
+   */
+  getMiddlewaresBy(filterFunction) {
+    return Object.values(this.middlewares).filter(filterFunction);
+  }
+
+  getMiddlewaresByName(name) {
+    return this.getMiddlewaresBy((middleware) => middleware.name === name);
+  }
+
   getMiddlewareById(id) {
     return this.middlewares[id];
   }
@@ -199,7 +216,7 @@ class MiddlewaresController extends AbstractController {
   }
 
   async list(origin = null, type = null) {
-    const list = await this.model.getMiddlewares(origin, type);
+    const list = await this.model.getMiddlewares({ origin, type });
     return list || [];
   }
 

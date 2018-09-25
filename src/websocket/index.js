@@ -17,6 +17,8 @@ export class WSRouter {
   }
 
   start() {
+    this.loadExistingMiddleware();
+
     const that = this;
     this.wss.on("connection", (ws, req) => {
       that.startClient(ws, req).then();
@@ -65,26 +67,73 @@ export class WSRouter {
     });
   }
 
-  addMiddlewareRoute(route) {
-    let { classes } = route;
-    if (this.middleware) {
-      if (this.middleware.classes) {
-        classes = [...new Set([...classes, ...this.middleware.classes])];
-      }
-      logger.info("WIP merge WS middleware", classes, this.middleware);
+  loadExistingMiddleware() {
+    // if a websocket middleware already exist, use it
+    const middlewares = this.app.controllers
+      .getMiddlewares()
+      .getMiddlewaresByName("websocket");
+    logger.warn("existing websocket middlewares ", middlewares);
+    // if websocket middleware found
+    if (middlewares.length > 0) {
+      this.middleware = middlewares[0]; // eslint-disable-line
+      this.middleware.onDispatch = this.onDispatch.bind(this);
     }
-    const onDispatch = this.onDispatch.bind(this);
+    this.middleware = middlewares.length > 0 ? middlewares[0] : null;
+  }
+
+  createMiddleware(classes = ["messenger"]) {
+    return {
+      name: "websocket",
+      classes,
+      status: "start",
+      onDispatch: this.onDispatch.bind(this),
+    };
+  }
+
+  attachMiddleware(middleware) {
     this.app.controllers
       .getMiddlewares()
-      .attach({
-        name: "websocket",
-        classes,
-        status: "start",
-        onDispatch,
-      })
+      .attach(middleware)
       .then((m) => {
         this.middleware = m;
       });
+  }
+
+  // check if classes1 contains all classes2 items
+  static areClassesIncluded(classes1, classes2) {
+    return classes2.every((element) => {
+      if (classes1.includes(element)) {
+        return true;
+      }
+      return false;
+    });
+  }
+
+  addMiddlewareRoute(route) {
+    const { classes } = route;
+    let shouldUpdateMiddleware = false;
+
+    // if middleware doesnt exist create a new one
+    if (!this.middleware) {
+      this.middleware = this.createMiddleware(classes);
+      shouldUpdateMiddleware = true;
+    }
+
+    // if route.classes not present in middleware.classes -> merge classes
+    if (
+      this.middleware.classes &&
+      classes &&
+      !WSRouter.areClassesIncluded(this.middleware.classes, classes)
+    ) {
+      this.middleware.classes = [
+        ...new Set([...classes, ...this.middleware.classes]),
+      ];
+      shouldUpdateMiddleware = true;
+    }
+
+    if (shouldUpdateMiddleware) {
+      this.attachMiddleware(this.middleware);
+    }
   }
 
   static setChannel(ws, token, routeName, channelId = null) {
