@@ -6,7 +6,7 @@
  */
 import { setupLogger } from "zoapp-core";
 // eslint-disable-next-line
-import WSRouter from "../../src/websocket";
+import WSRouter, {WSRouter as WSRouterBase } from "../../src/websocket";
 
 setupLogger("test");
 
@@ -55,6 +55,46 @@ describe("WSRouter", () => {
         classes: ["messenger", "bot"],
       });
       expect(attachMiddlewareSpy.mock.calls[0][0].onDispatch).toBeDefined();
+    });
+  });
+  describe("handle client message", () => {
+    it("should call remove channel when unsubscribe", async () => {
+      const removeChannelSpy = jest.fn();
+      WSRouterBase.removeChannel = removeChannelSpy.bind(WSRouter);
+      const that = {};
+      const ws = { channelId: "id" };
+      const route = { callback: () => {} };
+      const message = "unsubscribe";
+      await WSRouterBase.handleClientMessage(
+        that,
+        ws,
+        null,
+        null,
+        route,
+        message,
+      );
+      expect(removeChannelSpy).toHaveBeenCalled();
+    });
+    it("should set channel and route when subscribe", async () => {
+      const addMiddlewareRouteSpy = jest.fn();
+      const that = { addMiddlewareRoute: addMiddlewareRouteSpy };
+      const ws = { channelId: "id" };
+      const route = { callback: () => {} };
+      const message = "subscribe";
+      await WSRouterBase.handleClientMessage(
+        that,
+        ws,
+        "token",
+        "routeName",
+        route,
+        message,
+      );
+      expect(addMiddlewareRouteSpy).toHaveBeenCalled();
+      expect(ws).toEqual({
+        channelId: null,
+        route: "routeName",
+        token: "token",
+      });
     });
   });
 });
