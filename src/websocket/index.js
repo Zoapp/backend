@@ -17,11 +17,11 @@ export class WSRouter {
   }
 
   start() {
-    this.loadExistingMiddleware();
+    this.initMiddleware();
 
     const that = this;
     this.wss.on("connection", (ws, req) => {
-      that.startClient(ws, req).then();
+      that.handleClientConnection(ws, req).then();
     });
 
     this.wss.on("error", (error) => {
@@ -67,18 +67,26 @@ export class WSRouter {
     });
   }
 
+  initMiddleware() {
+    this.loadExistingMiddleware();
+
+    // if middleware doesnt exist create a new one
+    if (!this.middleware) {
+      this.middleware = this.createMiddleware();
+      this.updateMiddleware(this.middleware);
+    }
+  }
+
   loadExistingMiddleware() {
     // if a websocket middleware already exist, use it
     const middlewares = this.app.controllers
       .getMiddlewares()
       .getMiddlewaresByName("websocket");
-    logger.warn("existing websocket middlewares ", middlewares);
     // if websocket middleware found
     if (middlewares.length > 0) {
       this.middleware = middlewares[0]; // eslint-disable-line
       this.middleware.onDispatch = this.onDispatch.bind(this);
     }
-    this.middleware = middlewares.length > 0 ? middlewares[0] : null;
   }
 
   createMiddleware(classes = ["messenger"]) {
@@ -90,7 +98,7 @@ export class WSRouter {
     };
   }
 
-  attachMiddleware(middleware) {
+  updateMiddleware(middleware) {
     this.app.controllers
       .getMiddlewares()
       .attach(middleware)
@@ -111,14 +119,6 @@ export class WSRouter {
 
   addMiddlewareRoute(route) {
     const { classes } = route;
-    let shouldUpdateMiddleware = false;
-
-    // if middleware doesnt exist create a new one
-    if (!this.middleware) {
-      this.middleware = this.createMiddleware(classes);
-      shouldUpdateMiddleware = true;
-    }
-
     // if route.classes not present in middleware.classes -> merge classes
     if (
       this.middleware.classes &&
@@ -128,11 +128,7 @@ export class WSRouter {
       this.middleware.classes = [
         ...new Set([...classes, ...this.middleware.classes]),
       ];
-      shouldUpdateMiddleware = true;
-    }
-
-    if (shouldUpdateMiddleware) {
-      this.attachMiddleware(this.middleware);
+      this.updateMiddleware(this.middleware);
     }
   }
 
@@ -146,7 +142,34 @@ export class WSRouter {
     ws.channelId = null;
   }
 
-  async startClient(ws, req) {
+  static async handleClientMessage(that, ws, token, routeName, route, message) {
+    let data = null;
+    const m = message.trim();
+    if (m.charAt(0) === "{" || m.charAt(0) === "[") {
+      data = JSON.parse(m);
+    } else {
+      data = { event: m };
+    }
+    const { event, channelId } = data;
+    if (event === "pong") {
+      // logger.info("pong");
+      ws.isAlive = true;
+    } else if (event === "subscribe") {
+      WSRouter.setChannel(ws, token, routeName, channelId);
+      that.addMiddlewareRoute(route);
+    } else if (data.event === "unsubscribe") {
+      WSRouter.removeChannel(ws);
+    }
+    if (route.callback) {
+      const cId = channelId || ws.channelId;
+      const response = await route.callback(event, cId, data, ws);
+      if (response) {
+        ws.send(JSON.stringify(response));
+      }
+    }
+  }
+
+  async handleClientConnection(ws, req) {
     const location = url.parse(req.url, true);
     // TODO check access_token and route using pathname
     const routeName = location.pathname;
@@ -173,31 +196,7 @@ export class WSRouter {
     WSRouter.setChannel(ws, token, routeName);
     const that = this;
     ws.on("message", async (message) => {
-      let data = null;
-      const m = message.trim();
-      if (m.charAt(0) === "{" || m.charAt(0) === "[") {
-        data = JSON.parse(m);
-      } else {
-        data = { event: m };
-      }
-      const { event, channelId } = data;
-      if (event === "pong") {
-        // logger.info("pong");
-        ws.isAlive = true;
-      } else if (event === "subscribe") {
-        WSRouter.setChannel(ws, token, routeName, channelId);
-        that.addMiddlewareRoute(route);
-      } else if (data.event === "unsubscribe") {
-        WSRouter.removeChannel(ws);
-        that.app.controllers.getMiddlewares().remove(that.middleware);
-      }
-      if (route.callback) {
-        const cId = channelId || ws.channelId;
-        const response = await route.callback(event, cId, data, ws);
-        if (response) {
-          ws.send(JSON.stringify(response));
-        }
-      }
+      WSRouter.handleClientMessage(that, ws, token, routeName, route, message);
     });
     ws.on("error", (error) => {
       logger.error("WS Error caught: ");
@@ -214,10 +213,7 @@ export class WSRouter {
   }
 
   onDispatch(className, data) {
-    let { event } = data;
-    if (!event) {
-      event = data.action;
-    }
+    const event = data.event ? data.event : data.action;
     // logger.info("data.event=", event, data.origin);
     this.wss.clients.forEach((ws) => {
       // logger.info("ws=", ws.channelId, ws.route);
