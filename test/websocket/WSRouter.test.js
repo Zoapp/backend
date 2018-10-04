@@ -11,12 +11,35 @@ import WSRouter, {WSRouter as WSRouterBase } from "../../src/websocket";
 setupLogger("test");
 
 describe("WSRouter", () => {
-  describe("add middleware route", () => {
-    it("should merge WS middleware classes", () => {
-      const attachMiddlewareSpy = jest.fn();
+  describe("init middleware", () => {
+    it("should create new middleware", () => {
+      const updateMiddlewareSpy = jest.fn();
       const wsRouter = WSRouter({ server: { wss: {} } });
       wsRouter.loadExistingMiddleware = () => {};
-      wsRouter.attachMiddleware = attachMiddlewareSpy;
+      wsRouter.updateMiddleware = updateMiddlewareSpy;
+
+      // without previous middleware
+      wsRouter.middleware = null;
+      const newMiddleware = {
+        name: "websocket",
+        classes: ["messenger"],
+        status: "start",
+        // onDispatch,
+      };
+
+      wsRouter.initMiddleware();
+      // wsRouter.addMiddlewareRoute({ classes: ["messenger", "bot"] });
+      expect(updateMiddlewareSpy).toHaveBeenCalled();
+      expect(updateMiddlewareSpy.mock.calls[0][0]).toMatchObject(newMiddleware);
+      expect(updateMiddlewareSpy.mock.calls[0][0].onDispatch).toBeDefined();
+    });
+  });
+  describe("add middleware route", () => {
+    it("should merge WS middleware classes", () => {
+      const updateMiddlewareSpy = jest.fn();
+      const wsRouter = WSRouter({ server: { wss: {} } });
+      wsRouter.loadExistingMiddleware = () => {};
+      wsRouter.updateMiddleware = updateMiddlewareSpy;
 
       const testMiddleware = {
         id: "kyd29d",
@@ -29,32 +52,16 @@ describe("WSRouter", () => {
       wsRouter.middleware = { ...testMiddleware };
       // known classes. No need to update the middleware
       wsRouter.addMiddlewareRoute({ classes: ["messenger"] });
-      expect(attachMiddlewareSpy).not.toHaveBeenCalled();
-      attachMiddlewareSpy.mockClear();
+      expect(updateMiddlewareSpy).not.toHaveBeenCalled();
+      updateMiddlewareSpy.mockClear();
 
       // new classes
       wsRouter.addMiddlewareRoute({ classes: ["sandbox"] });
-      expect(attachMiddlewareSpy).toHaveBeenCalledWith({
+      expect(updateMiddlewareSpy).toHaveBeenCalledWith({
         ...testMiddleware,
         classes: ["sandbox", "messenger", "bot"],
       });
-      attachMiddlewareSpy.mockClear();
-
-      // without previous middleware
-      wsRouter.middleware = null;
-      const newMiddleware = {
-        name: "websocket",
-        classes: ["messenger"],
-        status: "start",
-        // onDispatch,
-      };
-      wsRouter.addMiddlewareRoute({ classes: ["messenger", "bot"] });
-      expect(attachMiddlewareSpy).toHaveBeenCalled();
-      expect(attachMiddlewareSpy.mock.calls[0][0]).toMatchObject({
-        ...newMiddleware,
-        classes: ["messenger", "bot"],
-      });
-      expect(attachMiddlewareSpy.mock.calls[0][0].onDispatch).toBeDefined();
+      updateMiddlewareSpy.mockClear();
     });
   });
   describe("handle client message", () => {

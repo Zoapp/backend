@@ -17,7 +17,7 @@ export class WSRouter {
   }
 
   start() {
-    this.loadExistingMiddleware();
+    this.initMiddleware();
 
     const that = this;
     this.wss.on("connection", (ws, req) => {
@@ -67,18 +67,26 @@ export class WSRouter {
     });
   }
 
+  initMiddleware() {
+    this.loadExistingMiddleware();
+
+    // if middleware doesnt exist create a new one
+    if (!this.middleware) {
+      this.middleware = this.createMiddleware();
+      this.updateMiddleware(this.middleware);
+    }
+  }
+
   loadExistingMiddleware() {
     // if a websocket middleware already exist, use it
     const middlewares = this.app.controllers
       .getMiddlewares()
       .getMiddlewaresByName("websocket");
-    logger.warn("existing websocket middlewares ", middlewares);
     // if websocket middleware found
     if (middlewares.length > 0) {
       this.middleware = middlewares[0]; // eslint-disable-line
       this.middleware.onDispatch = this.onDispatch.bind(this);
     }
-    this.middleware = middlewares.length > 0 ? middlewares[0] : null;
   }
 
   createMiddleware(classes = ["messenger"]) {
@@ -90,7 +98,7 @@ export class WSRouter {
     };
   }
 
-  attachMiddleware(middleware) {
+  updateMiddleware(middleware) {
     this.app.controllers
       .getMiddlewares()
       .attach(middleware)
@@ -111,14 +119,6 @@ export class WSRouter {
 
   addMiddlewareRoute(route) {
     const { classes } = route;
-    let shouldUpdateMiddleware = false;
-
-    // if middleware doesnt exist create a new one
-    if (!this.middleware) {
-      this.middleware = this.createMiddleware(classes);
-      shouldUpdateMiddleware = true;
-    }
-
     // if route.classes not present in middleware.classes -> merge classes
     if (
       this.middleware.classes &&
@@ -128,11 +128,7 @@ export class WSRouter {
       this.middleware.classes = [
         ...new Set([...classes, ...this.middleware.classes]),
       ];
-      shouldUpdateMiddleware = true;
-    }
-
-    if (shouldUpdateMiddleware) {
-      this.attachMiddleware(this.middleware);
+      this.updateMiddleware(this.middleware);
     }
   }
 
