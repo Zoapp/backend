@@ -14,10 +14,10 @@ jest.mock("../../src/models/middlewares");
 
 describe("MiddlewaresController", () => {
   const pluginManagerRegisterSpy = jest.fn();
-  const main = {
+  const mainController = {
     zoapp: {
       pluginsManager: {
-        register: pluginManagerRegisterSpy,
+        registerMiddleware: pluginManagerRegisterSpy,
       },
       controllers: {
         getMiddlewares: () => ({
@@ -33,7 +33,7 @@ describe("MiddlewaresController", () => {
   it("attach a middleware", async () => {
     const middlewaresController = new MiddlewaresController(
       "name",
-      main,
+      mainController,
       "className",
     );
 
@@ -71,7 +71,7 @@ describe("MiddlewaresController", () => {
   it("get middlewares", async () => {
     const middlewaresController = new MiddlewaresController(
       "name",
-      main,
+      mainController,
       "className",
     );
     await middlewaresController.attachLocally({ id: "aaa", name: "md_a" });

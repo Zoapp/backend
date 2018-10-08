@@ -34,7 +34,7 @@ class LocalTunnel {
     }
   }
 
-  async register(params) {
+  async registerMiddleware(params) {
     // WIP
     const { port, ...options } = params;
     return new Promise((resolve, reject) => {
@@ -60,7 +60,7 @@ class LocalTunnel {
     });
   }
 
-  async unregister() {
+  async unregisterMiddleware() {
     return new Promise((resolve) => {
       if (this.tunnel) {
         this.tunnel.close();

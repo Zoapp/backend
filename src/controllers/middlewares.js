@@ -56,7 +56,7 @@ class MiddlewaresController extends AbstractController {
    * Add middleware on the middlewares list.
    *
    * Remove existing middleware with same ID if needed.
-   * Call register on pluginManager and model.
+   * Call registerMiddleware on pluginManager and model.
    * Call attachLocally(m).
    * @param {Object} middleware - middleware properties object
    */
@@ -73,7 +73,7 @@ class MiddlewaresController extends AbstractController {
     if (!m.id) {
       m.id = this.model.generateId(48);
     }
-    m = await this.zoapp.pluginsManager.register(m);
+    m = await this.zoapp.pluginsManager.registerMiddleware(m);
     m = await this.model.register(m, id);
     m.onDispatch = middleware.onDispatch;
     return this.attachLocally(m);
@@ -96,13 +96,13 @@ class MiddlewaresController extends AbstractController {
 
   /**
    * Remove a middleware.
-   * Call Unregister on plugin manager.
+   * Call UnregisterMiddleware on plugin manager.
    * Dispatch a "removeMiddleware" action.
    * @param {?} middleware
    */
   async remove(middleware) {
     let ret = true;
-    const m = await this.zoapp.pluginsManager.unregister(middleware);
+    const m = await this.zoapp.pluginsManager.unregisterMiddleware(middleware);
     const { id } = m;
     // Remove the middleware from the DB.
     ret = await this.model.unregister(id);
@@ -215,8 +215,8 @@ class MiddlewaresController extends AbstractController {
     return [];
   }
 
-  async list(origin = null, type = null) {
-    const list = await this.model.getMiddlewares({ origin, type });
+  async list(options) {
+    const list = await this.model.getMiddlewares(options);
     return list || [];
   }
 

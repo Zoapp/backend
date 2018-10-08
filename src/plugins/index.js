@@ -53,24 +53,24 @@ class PluginsManager {
    * If there is a plugin with the same name has the middleware, it will call his register(middleware) method.
    * @param {Object} middleware - middleware properties object
    */
-  async register(middleware) {
+  async registerMiddleware(middleware) {
     // WIP
     const { name } = middleware;
     const plugin = this.get(name);
     // logger.info("register", plugin, name);
     // logger.info("register", plugin.getName());
     if (plugin) {
-      return plugin.register(middleware);
+      return plugin.registerMiddleware(middleware);
     }
     return middleware;
   }
 
-  async unregister(middleware) {
+  async unregisterMiddleware(middleware) {
     // WIP
     const { name } = middleware;
     const plugin = this.get(name);
     if (plugin) {
-      return plugin.unregister(middleware);
+      return plugin.unregisterMiddleware(middleware);
     }
     return middleware;
   }
