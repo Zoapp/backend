@@ -55,7 +55,6 @@ export default class extends AbstractController {
 
   async getParameters(me, clientId, isAdmin = false, isMaster = false) {
     const parameters = {};
-    // await this.main.getParameters().getInnerTable().create();
     // WIP get backend settings
     parameters.backend = await this.main.getParameters().getValue("backend");
     if (!parameters.backend) {
@@ -135,6 +134,11 @@ export default class extends AbstractController {
       delete parameters.backend.clientId;
       delete parameters.backend.clientSecret;
       delete parameters.backend.tunnel;
+    }
+
+    // Enable multiProjects from config
+    if (this.main.config.multiProjects) {
+      parameters.multiProjects = true;
     }
 
     if (this.zoapp.extensions && this.zoapp.extensions.getAdminParameters) {
