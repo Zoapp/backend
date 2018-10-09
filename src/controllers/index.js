@@ -49,6 +49,21 @@ class MainController {
     await this.parameters.close();
   }
 
+  async isMultiProjects(userId, scope = "anonymous") {
+    let multiProjects;
+    if (this.config.multiProjects) {
+      const mp = this.config.multiProjects;
+      if (typeof mp === "object") {
+        if (mp[scope]) {
+          multiProjects = true;
+        }
+      } else {
+        multiProjects = !!mp;
+      }
+    }
+    return multiProjects;
+  }
+
   getName() {
     return this.config.name || "";
   }

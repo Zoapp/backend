@@ -16,10 +16,15 @@ export default class extends AbstractModel {
     return collection.size();
   }
 
+  async getUserProfile(id, profiles = this.getInnerTable("profiles")) {
+    console.log("profiles=", id, profiles);
+    return profiles.getItem(`userId=${id}`);
+  }
+
   async getProfile(id, profiles = this.getInnerTable("profiles")) {
     let profile = await profiles.getItem(id);
     if (!profile) {
-      profile = await profiles.getItem(`userId=${id}`);
+      profile = await this.getUserProfile(id, profiles);
     }
     return profile;
   }

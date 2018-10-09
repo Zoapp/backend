@@ -13,6 +13,10 @@ export default class extends AbstractController {
     this.model = new UsersModel(main.database, main.config);
   }
 
+  async getUserProfile(id) {
+    return this.model.getUserProfile(id);
+  }
+
   async getProfile(params) {
     let profile = null;
     if (params.user && params.user.provider) {
