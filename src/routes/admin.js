@@ -26,12 +26,8 @@ export default class extends CommonRoutes {
     const me = await this.access(context);
     const scope = context.getScope();
     const clientId = context.getClientId();
-    const isMaster = scope === "master";
-    const isAdmin = isMaster || scope === "admin";
     // WIP get backend parameters
-    return this.controller
-      .getAdmin()
-      .getParameters(me, clientId, isAdmin, isMaster);
+    return this.controller.getAdmin().getParameters(me, clientId, scope);
   }
 
   async updateAdmin(context) {

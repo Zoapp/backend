@@ -53,9 +53,10 @@ export default class extends AbstractController {
     // TODO
   }
 
-  async getParameters(me, clientId, isAdmin = false, isMaster = false) {
+  async getParameters(user, clientId, scope) {
+    const isMaster = scope === "master";
+    const isAdmin = isMaster || scope === "admin";
     const parameters = {};
-    // await this.main.getParameters().getInnerTable().create();
     // WIP get backend settings
     parameters.backend = await this.main.getParameters().getValue("backend");
     if (!parameters.backend) {
@@ -137,14 +138,24 @@ export default class extends AbstractController {
       delete parameters.backend.tunnel;
     }
 
+    // Enable multiProjects from config
+    const multiProjects = await this.main.isMultiProjects(user.id, scope);
+    if (multiProjects) {
+      parameters.multiProjects = true;
+    }
+
     if (this.zoapp.extensions && this.zoapp.extensions.getAdminParameters) {
-      return this.zoapp.extensions.getAdminParameters(me, isMaster, parameters);
+      return this.zoapp.extensions.getAdminParameters(
+        user,
+        isMaster,
+        parameters,
+      );
     }
 
     return { params: parameters };
   }
 
-  async setParameters(me, clientId, parameters) {
+  async setParameters(user, clientId, parameters) {
     // TODO check errors
     if (parameters.tunnel) {
       let { tunnel } = parameters;
@@ -196,7 +207,7 @@ export default class extends AbstractController {
     } else if (parameters.emailServer) {
       await this.configureMail(parameters.emailServer);
     }
-    return this.getParameters(me, clientId, true);
+    return this.getParameters(user, clientId, true);
   }
 
   async configureMail(parameters) {
