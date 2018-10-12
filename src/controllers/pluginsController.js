@@ -87,11 +87,14 @@ class PluginsController extends AbstractController {
 
   async getPluginsByBotId(botId) {
     const middlewareController = this.zoapp.controllers.getMiddlewares();
-    const middlewares = await middlewareController.availableMiddlewares(botId);
+    const middlewares = await middlewareController.getMiddlewaresByBotId({
+      botId,
+      includeCommon: true,
+    });
     const orgPlugins = this.getPlugins();
 
     const plugins = orgPlugins.map((plugin) => {
-      const newPlugin = plugin;
+      const newPlugin = { ...plugin };
       if (PluginsController.hasMiddleware(plugin, middlewares)) {
         newPlugin.isAvailable = true;
         if (PluginsController.hasStartedMiddleware(plugin, middlewares)) {
@@ -101,25 +104,6 @@ class PluginsController extends AbstractController {
       return newPlugin;
     });
     return plugins;
-  }
-
-  /**
-   * List plugins with a middleware for a given botId
-   * @param {} options
-   */
-  async getAvailablePlugins(botId) {
-    const middlewareController = this.zoapp.controllers.getMiddlewares();
-    // const middlewares = await middlewareController.availableMiddlewares(botId);
-    const names = await middlewareController.getAvailableMiddlewaresNames(
-      botId,
-    );
-
-    const plugins = Object.values(this.plugins);
-    const availablePlugins = plugins.filter((plugin) =>
-      names.includes(plugin.name),
-    );
-
-    return availablePlugins;
   }
 
   getPlugins(options = {}) {

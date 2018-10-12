@@ -32,11 +32,17 @@ describe("PluginsController", () => {
     getName: () => "plugin4",
   };
 
-  const defaultPlugins = [{ ...plugin1 }, { ...plugin2 }];
+  const defaultPlugins = [
+    { ...plugin1 },
+    { ...plugin2 },
+    { ...plugin3 },
+    { ...plugin4 },
+  ];
   // avoid init adding plugins
   jest.spyOn(PluginsController.prototype, "init").mockImplementation(() => {});
   const getAvailableMiddlewaresNamesSpy = jest.fn();
   const availableMiddlewaresSpy = jest.fn();
+  const getMiddlewaresByBotIdSpy = jest.fn();
   const mainController = {
     zoapp: {
       controllers: {
@@ -44,6 +50,7 @@ describe("PluginsController", () => {
           dispatchEvent: () => {},
           getAvailableMiddlewaresNames: getAvailableMiddlewaresNamesSpy,
           availableMiddlewares: availableMiddlewaresSpy,
+          getMiddlewaresByBotId: getMiddlewaresByBotIdSpy,
         }),
       },
     },
@@ -96,26 +103,58 @@ describe("PluginsController", () => {
     expect(activeMessengerPlugins).toHaveLength(1);
   });
 
-  it("get available plugins", async () => {
+  it("get plugins by bot id", async () => {
+    const middlewares = [
+      { name: "plugin4", origin: null, status: "start" },
+      { name: "plugin1", origin: "bot1", status: "disabled" },
+      { name: "plugin3", origin: "bot1", status: "start" },
+    ];
+
     const pluginsController = new PluginsController(
       "name",
       mainController,
       "className",
     );
-    pluginsController.add(plugin1);
-    pluginsController.add(plugin2);
-    getAvailableMiddlewaresNamesSpy.mockImplementation(() => [
-      "plugin1",
-      "md_2",
-    ]);
-    const availablePlugins = await pluginsController.getAvailablePlugins(
-      "bot1",
-    );
-    expect(pluginsController.length()).toEqual(2);
-    expect(availablePlugins).toEqual([plugin1]);
-  });
 
-  it("get plugins by bot id", () => {});
+    defaultPlugins.forEach((plugin) => pluginsController.add(plugin));
+    expect(pluginsController.length()).toEqual(4);
+
+    getMiddlewaresByBotIdSpy.mockReturnValue(middlewares);
+    const plugins = await pluginsController.getPluginsByBotId("bot1");
+    expect(getMiddlewaresByBotIdSpy).toHaveBeenCalledWith({
+      botId: "bot1",
+      includeCommon: true,
+    });
+    expect(JSON.stringify(plugins)).toEqual(
+      JSON.stringify([
+        {
+          name: "plugin1",
+          getName: () => "plugin1",
+          isAvailable: true,
+        },
+        {
+          name: "plugin2",
+          isActive: true,
+          getName: () => "plugin2",
+        },
+        {
+          name: "plugin3",
+          type: "messenger",
+          getName: () => "plugin3",
+          isAvailable: true,
+          isStarted: true,
+        },
+        {
+          name: "plugin4",
+          type: "messenger",
+          isActive: true,
+          getName: () => "plugin4",
+          isAvailable: true,
+          isStarted: true,
+        },
+      ]),
+    );
+  });
 
   // PRIVATE FUNCTIONS
 

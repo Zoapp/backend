@@ -84,6 +84,12 @@ export default (zoapp) => {
   // /plugins routes
   route = zoapp.createRoute("/plugins");
   route.add("GET", "", ["owner", "admin", "master"], plugins.getPlugins);
+  route.add(
+    "GET",
+    "/:origin",
+    ["owner", "admin", "master"],
+    plugins.getBotPlugins,
+  );
 
   // /parameters routes
   route = zoapp.createRoute("/params");
