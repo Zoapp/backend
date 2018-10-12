@@ -5483,16 +5483,16 @@ yargs@~3.10.0:
     decamelize "^1.0.0"
     window-size "0.1.0"
 
-zoapp-core@^0.12.3:
+zoapp-core@0.12.3, zoapp-core@^0.12.3:
   version "0.12.3"
   resolved "https://registry.yarnpkg.com/zoapp-core/-/zoapp-core-0.12.3.tgz#a62b796f055fe9bf85ed75fbd876a94a825035a2"
   dependencies:
     mysql2 "^1.5.1"
     winston "2.4.0"
 
-zoauth-server@0.9.2:
-  version "0.9.2"
-  resolved "https://registry.yarnpkg.com/zoauth-server/-/zoauth-server-0.9.2.tgz#a5f16e27da450b9ad6a43a4640499456ea09f013"
+zoauth-server@0.9.3:
+  version "0.9.3"
+  resolved "https://registry.yarnpkg.com/zoauth-server/-/zoauth-server-0.9.3.tgz#b12ac58c5437119f24b7d22c2be8d7967832a27b"
   dependencies:
     body-parser "^1.17.2"
     express "^4.15.3"
