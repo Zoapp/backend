@@ -17,7 +17,6 @@ export default class extends AbstractModel {
   }
 
   async getUserProfile(id, profiles = this.getInnerTable("profiles")) {
-    console.log("profiles=", id, profiles);
     return profiles.getItem(`userId=${id}`);
   }
 
