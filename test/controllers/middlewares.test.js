@@ -13,21 +13,48 @@ setupLogger("test");
 jest.mock("../../src/models/middlewares");
 
 describe("MiddlewaresController", () => {
-  const pluginManagerRegisterSpy = jest.fn();
+  const defaultMiddlewares = [
+    {
+      id: "aaa",
+      name: "md_a",
+      origin: "bot1",
+    },
+    {
+      id: "bbb",
+      name: "md_b",
+      origin: null,
+    },
+    {
+      id: "ccc",
+      name: "md_c",
+      origin: "bot1",
+    },
+    {
+      id: "ddd",
+      name: "md_c",
+      origin: "bot2",
+    },
+    {
+      id: "eee",
+      name: "md_c",
+      origin: "bot1",
+    },
+  ];
+  const pluginsControllerRegisterMiddlewareSpy = jest.fn();
   const mainController = {
     zoapp: {
-      pluginsManager: {
-        registerMiddleware: pluginManagerRegisterSpy,
-      },
       controllers: {
         getMiddlewares: () => ({
           dispatchEvent: () => {},
+        }),
+        getPluginsController: () => ({
+          registerMiddleware: pluginsControllerRegisterMiddlewareSpy,
         }),
       },
     },
   };
   afterEach(() => {
-    pluginManagerRegisterSpy.mockClear();
+    pluginsControllerRegisterMiddlewareSpy.mockClear();
   });
 
   it("attach a middleware", async () => {
@@ -62,7 +89,9 @@ describe("MiddlewaresController", () => {
     expect(middleware1.id).toEqual("1");
 
     // call register on this.zoapp.pluginsManager.register
-    expect(pluginManagerRegisterSpy).toHaveBeenCalledWith(middleware1);
+    expect(pluginsControllerRegisterMiddlewareSpy).toHaveBeenCalledWith(
+      middleware1,
+    );
     // call register on this.model
     expect(middlewaresController.model.register).toHaveBeenCalled();
     expect(middlewaresController.attachLocally).toHaveBeenCalled();
@@ -93,5 +122,88 @@ describe("MiddlewaresController", () => {
     const cccMiddleware = middlewaresController.getMiddlewaresByName("md_c");
     expect(cccMiddleware).toBeDefined();
     expect(cccMiddleware).toEqual([{ id: "ccc", name: "md_c" }]);
+  });
+  it("get middlewares by botId", async () => {
+    const middlewaresController = new MiddlewaresController(
+      "name",
+      mainController,
+      "className",
+    );
+
+    const listSpy = jest
+      .spyOn(middlewaresController, "list")
+      .mockReturnValueOnce([defaultMiddlewares[0], defaultMiddlewares[2]])
+      .mockReturnValueOnce([defaultMiddlewares[0], defaultMiddlewares[2]])
+      .mockReturnValueOnce([defaultMiddlewares[1]]);
+
+    // Without common middlewares
+    const middlewaresWithoutCommon = await middlewaresController.getMiddlewaresByBotId(
+      { botId: "bot1" },
+    );
+    expect(listSpy).toHaveBeenCalledTimes(1);
+    expect(listSpy.mock.calls[0][0]).toEqual({ origin: "bot1" });
+    const idsWithoutCommon = middlewaresWithoutCommon.map(
+      (middleware) => middleware.id,
+    );
+    expect(idsWithoutCommon).toEqual(["aaa", "ccc"]);
+    listSpy.mockClear();
+
+    // With common middlewares
+    const middlewaresWithCommon = await middlewaresController.getMiddlewaresByBotId(
+      {
+        botId: "bot1",
+        includeCommon: true,
+      },
+    );
+    expect(listSpy).toHaveBeenCalledTimes(2);
+    expect(listSpy.mock.calls[0][0]).toEqual({ origin: "bot1" });
+    expect(listSpy.mock.results[0].value).toEqual([
+      defaultMiddlewares[0],
+      defaultMiddlewares[2],
+    ]);
+    expect(listSpy.mock.calls[1][0]).toEqual({ origin: null });
+    expect(listSpy.mock.results[1].value).toEqual([defaultMiddlewares[1]]);
+
+    const idsWithCommon = middlewaresWithCommon.map(
+      (middleware) => middleware.id,
+    );
+    expect(idsWithCommon).toEqual(["aaa", "ccc", "bbb"]);
+    listSpy.mockClear();
+  });
+
+  it("get middlewares names by bot id", async () => {
+    const middlewaresController = new MiddlewaresController(
+      "name",
+      mainController,
+      "className",
+    );
+
+    const availableMiddlewaresSpy = jest
+      .spyOn(middlewaresController, "getMiddlewaresByBotId")
+      .mockReturnValueOnce([
+        defaultMiddlewares[0],
+        defaultMiddlewares[2],
+        defaultMiddlewares[4],
+      ])
+      .mockReturnValueOnce([
+        defaultMiddlewares[0],
+        defaultMiddlewares[2],
+        defaultMiddlewares[4],
+        defaultMiddlewares[1],
+      ])
+      .mockReturnValueOnce([defaultMiddlewares[1]]);
+
+    let names = await middlewaresController.getMiddlewaresNamesByBotId({
+      botId: "bot1",
+    });
+    expect(availableMiddlewaresSpy).toHaveBeenCalledTimes(1);
+    expect(names).toEqual(["md_a", "md_c"]);
+
+    names = await middlewaresController.getMiddlewaresNamesByBotId({
+      botId: "bot1",
+      includeCommon: true,
+    });
+    expect(availableMiddlewaresSpy).toHaveBeenCalledTimes(2);
+    expect(names).toEqual(["md_a", "md_c", "md_b"]);
   });
 });

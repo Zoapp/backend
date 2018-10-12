@@ -56,7 +56,7 @@ class MiddlewaresController extends AbstractController {
    * Add middleware on the middlewares list.
    *
    * Remove existing middleware with same ID if needed.
-   * Call registerMiddleware on pluginManager and model.
+   * Call registerMiddleware on pluginsController and model.
    * Call attachLocally(m).
    * @param {Object} middleware - middleware properties object
    */
@@ -73,7 +73,9 @@ class MiddlewaresController extends AbstractController {
     if (!m.id) {
       m.id = this.model.generateId(48);
     }
-    m = await this.zoapp.pluginsManager.registerMiddleware(m);
+    m = await this.zoapp.controllers
+      .getPluginsController()
+      .registerMiddleware(m);
     m = await this.model.register(m, id);
     m.onDispatch = middleware.onDispatch;
     return this.attachLocally(m);
@@ -96,13 +98,15 @@ class MiddlewaresController extends AbstractController {
 
   /**
    * Remove a middleware.
-   * Call UnregisterMiddleware on plugin manager.
+   * Call UnregisterMiddleware on pluginsController.
    * Dispatch a "removeMiddleware" action.
    * @param {?} middleware
    */
   async remove(middleware) {
     let ret = true;
-    const m = await this.zoapp.pluginsManager.unregisterMiddleware(middleware);
+    const m = await this.zoapp.controllers
+      .getPluginsController()
+      .unregisterMiddleware(middleware);
     const { id } = m;
     // Remove the middleware from the DB.
     ret = await this.model.unregister(id);
@@ -208,11 +212,34 @@ class MiddlewaresController extends AbstractController {
     return this.middlewares[id];
   }
 
-  async availableMiddlewares() {
-    // TODO
-    // list all middlewares available
-    this.todo = {};
-    return [];
+  /**
+   * Get middlewares available for a bot
+   * Can include common middlewares
+   * @param {string} botId
+   * @param {boolean} includeCommon
+   */
+  async getMiddlewaresByBotId({ botId, includeCommon = false }) {
+    const botMiddlewares = await this.list({ origin: botId });
+    const commonMiddlewares = includeCommon
+      ? await this.list({ origin: null })
+      : [];
+    return [...botMiddlewares, ...commonMiddlewares];
+  }
+
+  /**
+   * Get the names of all available middlewares for a given bot.
+   * Can include common middlewares
+   * return an array of unique middleware names
+   * @param {string} botId
+   */
+  async getMiddlewaresNamesByBotId({ botId, includeCommon = false }) {
+    const middlewares = await this.getMiddlewaresByBotId({
+      botId,
+      includeCommon,
+    });
+    // get unique list of middleware names
+    const names = new Set(middlewares.map((middleware) => middleware.name));
+    return [...names];
   }
 
   async list(options) {
