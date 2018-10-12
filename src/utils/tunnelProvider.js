@@ -7,15 +7,15 @@
 let provider = null;
 
 const TunnelProvider = {
-  listAll(pluginsManager) {
-    return pluginsManager.getPluginsNameList("TunnelProvider");
+  listAll(pluginsController) {
+    return pluginsController.getPluginsNameList("TunnelProvider");
   },
 
-  async register(pluginsManager, providerName, params) {
+  async register(pluginsController, providerName, params) {
     // TODO
     logger.info("tunnelProvider.register", providerName);
     provider = { ...params };
-    /* const plugin = pluginsManager.get(providerName);
+    /* const plugin = pluginsController.get(providerName);
     let url = null;
     if (plugin) {
       try {
@@ -33,12 +33,12 @@ const TunnelProvider = {
     return provider.url;
   },
 
-  async unregister(pluginsManager, providerName) {
+  async unregister(pluginsController, providerName) {
     // TODO
     logger.info("tunnelProvider.unregister", providerName);
     if (provider.provider === providerName) {
       provider = null;
-      const plugin = pluginsManager.get(providerName);
+      const plugin = pluginsController.get(providerName);
       if (plugin) {
         try {
           await plugin.unregister();

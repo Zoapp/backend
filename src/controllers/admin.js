@@ -30,7 +30,7 @@ export default class extends AbstractController {
           localhost: tunnel.localhost,
         };
         const url = await TunnelProvider.register(
-          this.zoapp.pluginsManager,
+          this.zoapp.controllers.getPluginsController(),
           tunnel.provider,
           params,
         );
@@ -38,7 +38,7 @@ export default class extends AbstractController {
           logger.info("TunnelProvider url changed", url);
           backend.tunnel.active.url = url;
           backend.tunnel.active.subdomain = TunnelProvider.getActive(
-            this.zoapp.pluginsManager,
+            this.zoapp.controllers.getPluginsController(),
           ).subdomain;
           await this.getMainParameters().setValue("backend", backend);
         }
@@ -70,11 +70,11 @@ export default class extends AbstractController {
     }
     // TODO remove tunnel stuff here and create a middleware dispatch for it
     parameters.backend.tunnel.providers = TunnelProvider.listAll(
-      this.zoapp.pluginsManager,
+      this.zoapp.controllers.getPluginsController(),
     );
     if (!parameters.backend.tunnel.active) {
       parameters.backend.tunnel.active = TunnelProvider.getActive(
-        this.zoapp.pluginsManager,
+        this.zoapp.controllers.getPluginsController(),
       );
     }
 
@@ -166,25 +166,28 @@ export default class extends AbstractController {
         (await this.getMainParameters().getValue("backend")) || {};
       let prevTunnel = backend.tunnel;
       if (!prevTunnel) {
-        prevTunnel = TunnelProvider.getActive(this.zoapp.pluginsManager) || {};
+        prevTunnel =
+          TunnelProvider.getActive(
+            this.zoapp.controllers.getPluginsController(),
+          ) || {};
       }
       if (prevTunnel.provider !== parameters.tunnel.provider) {
         if (prevTunnel.provider) {
           await TunnelProvider.unregister(
-            this.zoapp.pluginsManager,
+            this.zoapp.controllers.getPluginsController(),
             prevTunnel.provider,
           );
         }
         if (tunnel !== "None") {
           tunnel.url = await TunnelProvider.register(
-            this.zoapp.pluginsManager,
+            this.zoapp.controllers.getPluginsController(),
             tunnel.provider,
             tunnel,
           );
           logger.info("tunnel.url", tunnel.url);
           if (tunnel.url) {
             tunnel.subdomain = TunnelProvider.getActive(
-              this.zoapp.pluginsManager,
+              this.zoapp.controllers.getPluginsController(),
             ).subdomain;
           }
         } else {

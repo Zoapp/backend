@@ -254,6 +254,16 @@ const commonDatasets = { password: "12345" };
 
     describe("/admin", () => {
       // it("should get admin infos /admin GET");
+      it("should get plugins on /plugins GET", async () => {
+        const res = await getAsync(
+          context,
+          "/plugins",
+          context.authUser1.access_token,
+        );
+        expect(res).to.have.length(1);
+        expect(res[0].name).to.equal("localtunnel");
+        expect(res[0].type).to.equal("TunnelProvider");
+      });
     });
 
     // TODO middlewares

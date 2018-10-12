@@ -8,6 +8,7 @@ import AdminRoutes from "./admin";
 import UsersRoutes from "./users";
 import ManagementRoutes from "./management";
 import CommonRoutes from "./common";
+import PluginsRoutes from "./plugins";
 
 export default (zoapp) => {
   const common = new CommonRoutes(zoapp.controllers);
@@ -15,6 +16,7 @@ export default (zoapp) => {
   const users = new UsersRoutes(zoapp.controllers);
   const management = new ManagementRoutes(zoapp.controllers);
   const { config } = zoapp.controllers.getParameters();
+  const plugins = new PluginsRoutes(zoapp.controllers);
 
   // / routes
   let route = zoapp.createRoute("/");
@@ -78,6 +80,10 @@ export default (zoapp) => {
     ["owner", "admin", "master"],
     admin.unregisterMiddleware,
   );
+
+  // /plugins routes
+  route = zoapp.createRoute("/plugins");
+  route.add("GET", "", ["owner", "admin", "master"], plugins.getPlugins);
 
   // /parameters routes
   route = zoapp.createRoute("/params");

@@ -7,10 +7,9 @@
 import localtunnel from "localtunnel";
 
 class LocalTunnel {
-  constructor(pluginManager) {
+  constructor() {
     this.tunnel = null;
     this.listener = null;
-    this.manager = pluginManager;
     this.name = "localtunnel";
     this.type = "TunnelProvider";
   }
@@ -72,9 +71,9 @@ class LocalTunnel {
 
 let instance = null;
 
-const LocalTunnelPlugin = (pluginManager) => {
+const LocalTunnelPlugin = () => {
   if (!instance) {
-    instance = new LocalTunnel(pluginManager);
+    instance = new LocalTunnel();
   }
   return instance;
 };
