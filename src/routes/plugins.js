@@ -6,6 +6,7 @@
  */
 import CommonRoutes from "./common";
 import deleteUndefined from "../utils/utilsObject";
+import PluginsController from "../controllers/pluginsController";
 
 class PluginsRoutes extends CommonRoutes {
   constructor(controller) {
@@ -26,7 +27,9 @@ class PluginsRoutes extends CommonRoutes {
 
   async getBotPlugins(context) {
     const { origin } = context.getParams();
-    return this.controller.getPluginsController().getPluginsByBotId(origin);
+    const pluginsController = this.controller.getPluginsController();
+    const plugins = await pluginsController.getPluginsByBotId(origin);
+    return plugins.map((plugin) => PluginsController.getParams(plugin));
   }
 }
 

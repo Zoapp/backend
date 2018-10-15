@@ -40,7 +40,7 @@ describe("MiddlewaresController", () => {
       origin: "bot1",
     },
   ];
-  const pluginsControllerRegisterMiddlewareSpy = jest.fn();
+  const pluginsControllerOnMiddlewareRegisterSpy = jest.fn();
   const mainController = {
     zoapp: {
       controllers: {
@@ -48,13 +48,13 @@ describe("MiddlewaresController", () => {
           dispatchEvent: () => {},
         }),
         getPluginsController: () => ({
-          registerMiddleware: pluginsControllerRegisterMiddlewareSpy,
+          onMiddlewareRegister: pluginsControllerOnMiddlewareRegisterSpy,
         }),
       },
     },
   };
   afterEach(() => {
-    pluginsControllerRegisterMiddlewareSpy.mockClear();
+    pluginsControllerOnMiddlewareRegisterSpy.mockClear();
   });
 
   it("attach a middleware", async () => {
@@ -89,7 +89,7 @@ describe("MiddlewaresController", () => {
     expect(middleware1.id).toEqual("1");
 
     // call register on this.zoapp.pluginsManager.register
-    expect(pluginsControllerRegisterMiddlewareSpy).toHaveBeenCalledWith(
+    expect(pluginsControllerOnMiddlewareRegisterSpy).toHaveBeenCalledWith(
       middleware1,
     );
     // call register on this.model

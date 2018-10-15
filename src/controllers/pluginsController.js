@@ -51,6 +51,26 @@ class PluginsController extends AbstractController {
     return Object.keys(this.plugins).length;
   }
 
+  /**
+   * Extract params object from plugin object
+   * Used for API response
+   * @param {object} plugin
+   */
+  static getParams(plugin) {
+    return {
+      origin: plugin.origin,
+      name: plugin.name,
+      title: plugin.title,
+      type: plugin.type,
+      classes: plugin.classes,
+      color: plugin.color,
+      icon: plugin.icon,
+      system: plugin.system,
+      isAvailable: plugin.isAvailable,
+      isStarted: plugin.isStarted,
+    };
+  }
+
   getPluginsNameList(type) {
     const list = [];
     Object.keys(this.plugins).forEach((name) => {
