@@ -75,7 +75,7 @@ class MiddlewaresController extends AbstractController {
     }
     m = await this.zoapp.controllers
       .getPluginsController()
-      .registerMiddleware(m);
+      .onMiddlewareRegister(m);
     m = await this.model.register(m, id);
     m.onDispatch = middleware.onDispatch;
     return this.attachLocally(m);
@@ -106,7 +106,7 @@ class MiddlewaresController extends AbstractController {
     let ret = true;
     const m = await this.zoapp.controllers
       .getPluginsController()
-      .unregisterMiddleware(middleware);
+      .onMiddlewareUnregister(middleware);
     const { id } = m;
     // Remove the middleware from the DB.
     ret = await this.model.unregister(id);

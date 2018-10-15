@@ -154,27 +154,27 @@ class PluginsController extends AbstractController {
 
   /**
    * Register a middleware.
-   * If there is a plugin with the same name has the middleware, it will call his register(middleware) method.
+   * If there is a plugin with the same name has the middleware, it will call his onMiddlewareRegister(middleware) method.
    * @param {Object} middleware - middleware properties object
    */
-  async registerMiddleware(middleware) {
+  async onMiddlewareRegister(middleware) {
     // WIP
     const { name } = middleware;
     const plugin = this.get(name);
     // logger.info("register", plugin, name);
     // logger.info("register", plugin.getName());
-    if (plugin) {
-      return plugin.registerMiddleware(middleware);
+    if (plugin && typeof plugin.onMiddlewareRegister === "function") {
+      return plugin.onMiddlewareRegister(middleware);
     }
     return middleware;
   }
 
-  async unregisterMiddleware(middleware) {
+  async onMiddlewareUnregister(middleware) {
     // WIP
     const { name } = middleware;
     const plugin = this.get(name);
     if (plugin) {
-      return plugin.unregisterMiddleware(middleware);
+      return plugin.onMiddlewareUnregister(middleware);
     }
     return middleware;
   }
