@@ -144,6 +144,14 @@ class PluginsController extends AbstractController {
     return this.get(pluginName);
   }
 
+  /**
+   * Proxy function
+   * @param {object} pluginData - data set in the plugin middleware
+   */
+  async registerPlugin(pluginData) {
+    return this.zoapp.controllers.getMiddlewares().register(pluginData);
+  }
+
   // front
   startPlugin(plugin) {
     const name = plugin.getName();

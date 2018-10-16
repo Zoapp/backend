@@ -264,6 +264,9 @@ const commonDatasets = { password: "12345" };
         expect(res[0].name).to.equal("localtunnel");
         expect(res[0].type).to.equal("TunnelProvider");
       });
+
+      // it("should register a plugin on /plugins POST", async () => {
+      // })
     });
 
     // TODO middlewares
