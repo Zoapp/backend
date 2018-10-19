@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { dbCreate } from "zoapp-core";
+import { dbCreate, EmailService } from "zoapp-core";
 import zoauthServer, { AuthRouter } from "zoauth-server";
 import Controllers from "./controllers";
 import RouteBuilder from "./routes";
@@ -34,6 +34,8 @@ export class App {
     this.pluginsManager = PluginsManager(this, this.configuration);
     this.wsRouter = WSRouterBuilder(this);
     RouteBuilder(this);
+
+    this.emailService = new EmailService();
   }
 
   get name() {
@@ -87,7 +89,6 @@ export class App {
     } else {
       throw new Error("ConfigurationError: auth configuration not found");
     }
-
     return authConfig;
   }
 
