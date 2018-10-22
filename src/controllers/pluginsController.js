@@ -8,6 +8,11 @@
 import LocalTunnelPlugin from "../plugins/localtunnel";
 import AbstractController from "./abstractController";
 
+/**
+ * PluginsController has two roles:
+ *  - store plugins object instances used by backend
+ *  - Do the bridge/proxy between plugins and middleware for the API
+ */
 class PluginsController extends AbstractController {
   /**
    * Create a middlewares controller.
@@ -52,22 +57,14 @@ class PluginsController extends AbstractController {
   }
 
   /**
-   * Extract params object from plugin object
+   * Extract params object from plugin object and associate middleware
    * Used for API response
    * @param {object} plugin
    */
-  static getParams(plugin) {
+  static getProperties(plugin, middleware) {
     return {
-      origin: plugin.origin,
-      name: plugin.name,
-      title: plugin.title,
-      type: plugin.type,
-      classes: plugin.classes,
-      color: plugin.color,
-      icon: plugin.icon,
-      system: plugin.system,
-      isAvailable: plugin.isAvailable,
-      isStarted: plugin.isStarted,
+      ...plugin.properties,
+      middleware,
     };
   }
 
@@ -150,6 +147,54 @@ class PluginsController extends AbstractController {
    */
   async registerPlugin(pluginData) {
     return this.zoapp.controllers.getMiddlewares().register(pluginData);
+  }
+
+  // API interface methods.
+
+  async apiGetPluginsByBotId(botId) {
+    const middlewareController = this.zoapp.controllers.getMiddlewares();
+    const middlewares = await middlewareController.getMiddlewaresByBotId({
+      botId,
+      includeCommon: true,
+    });
+    const orgPlugins = this.getPlugins();
+
+    const pluginsResponse = orgPlugins.map((plugin) => {
+      const middleware = middlewares.find((md) => md.name === plugin.name);
+      return {
+        ...plugin.properties,
+        middleware,
+      };
+    });
+    return pluginsResponse;
+  }
+
+  async apiRegisterPlugin(plugin) {
+    const defaultMiddleware = this.getPlugin(
+      plugin.name,
+    ).getMiddlewareDefaultProperties();
+
+    const newMiddleware = {
+      ...defaultMiddleware,
+      ...plugin.middleware, // override with received data
+    };
+
+    const result = await this.zoapp.controllers
+      .getMiddlewares()
+      .register(newMiddleware);
+    // return plugin wih registered middleware
+    return { ...plugin, middleware: result };
+  }
+
+  async apiGetPlugins(options) {
+    const plugins = this.getPlugins(options);
+    const pluginsProperties = plugins.map((plugin) => plugin.properties);
+    return pluginsProperties;
+  }
+
+  async apiDeletePluginByMiddlewareId(middlewareId) {
+    const middlewareController = this.zoapp.controllers.getMiddlewares();
+    return middlewareController.removeById(middlewareId);
   }
 
   // front

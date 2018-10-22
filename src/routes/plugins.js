@@ -6,7 +6,6 @@
  */
 import CommonRoutes from "./common";
 import deleteUndefined from "../utils/utilsObject";
-import PluginsController from "../controllers/pluginsController";
 
 class PluginsRoutes extends CommonRoutes {
   constructor(controller) {
@@ -16,6 +15,7 @@ class PluginsRoutes extends CommonRoutes {
     this.getPlugins = this.getPlugins.bind(this);
     this.getBotPlugins = this.getBotPlugins.bind(this);
     this.registerPlugin = this.registerPlugin.bind(this);
+    this.deletePlugin = this.deletePlugin.bind(this);
   }
 
   async getPlugins(context) {
@@ -23,21 +23,26 @@ class PluginsRoutes extends CommonRoutes {
     const { type, name } = context.getQuery();
     const options = deleteUndefined({ type, name });
     const pluginsController = this.controller.getPluginsController();
-    const plugins = await pluginsController.getPlugins(options);
-    return plugins.map((plugin) => PluginsController.getParams(plugin));
+    const plugins = await pluginsController.apiGetPlugins(options);
+    return plugins;
   }
 
   async getBotPlugins(context) {
     const { botId } = context.getParams();
     const pluginsController = this.controller.getPluginsController();
-    const plugins = await pluginsController.getPluginsByBotId(botId);
-    return plugins.map((plugin) => PluginsController.getParams(plugin));
+    return pluginsController.apiGetPluginsByBotId(botId);
   }
 
   async registerPlugin(context) {
     const body = context.getBody();
     const pluginsController = this.controller.getPluginsController();
-    return pluginsController.registerPlugin(body);
+    return pluginsController.apiRegisterPlugin(body);
+  }
+
+  async deletePlugin(context) {
+    const { middlewareId } = context.getQuery();
+    const pluginsController = this.controller.getPluginsController();
+    return pluginsController.apiDeletePluginByMiddlewareId(middlewareId);
   }
 }
 

@@ -104,10 +104,10 @@ class MiddlewaresController extends AbstractController {
    */
   async remove(middleware) {
     let ret = true;
-    const m = await this.zoapp.controllers
+    const { id } = middleware;
+    await this.zoapp.controllers
       .getPluginsController()
       .onMiddlewareUnregister(middleware);
-    const { id } = m;
     // Remove the middleware from the DB.
     ret = await this.model.unregister(id);
     // Remove the middleware loccaly
@@ -119,6 +119,14 @@ class MiddlewaresController extends AbstractController {
       middleware.id,
     );
     return ret;
+  }
+
+  async removeById(middlewareId) {
+    const middleware = await this.getMiddlewareById(middlewareId);
+    if (middleware) {
+      return this.remove(middleware);
+    }
+    return { error: `No middleware found for id ${middlewareId}` };
   }
 
   removeLocally(middlewareId) {

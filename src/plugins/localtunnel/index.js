@@ -5,13 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 import localtunnel from "localtunnel";
+import AbstractPlugin from "../abstractPlugin";
 
-class LocalTunnel {
+class LocalTunnel extends AbstractPlugin {
   constructor() {
+    super("localtunnel", null, "TunnelProvider", [], null);
     this.tunnel = null;
     this.listener = null;
-    this.name = "localtunnel";
-    this.type = "TunnelProvider";
   }
 
   getName() {
