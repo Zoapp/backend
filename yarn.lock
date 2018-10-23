@@ -3715,6 +3715,10 @@ node-pre-gyp@^0.6.39:
     tar "^2.2.1"
     tar-pack "^3.4.0"
 
+nodemailer@4.6.8:
+  version "4.6.8"
+  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-4.6.8.tgz#f82fb407828bf2e76d92acc34b823d83e774f89c"
+
 nodemailer@^4.6.5:
   version "4.6.5"
   resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-4.6.5.tgz#306ce18c4543f3f06e5f76665d3cb6277f872f53"
@@ -5483,7 +5487,15 @@ yargs@~3.10.0:
     decamelize "^1.0.0"
     window-size "0.1.0"
 
-zoapp-core@0.12.3, zoapp-core@^0.12.3:
+zoapp-core@0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/zoapp-core/-/zoapp-core-0.13.0.tgz#482013047aec130b12ec5c40f6cb24baeb9f617c"
+  dependencies:
+    mysql2 "^1.5.1"
+    nodemailer "4.6.8"
+    winston "2.4.0"
+
+zoapp-core@^0.12.3:
   version "0.12.3"
   resolved "https://registry.yarnpkg.com/zoapp-core/-/zoapp-core-0.12.3.tgz#a62b796f055fe9bf85ed75fbd876a94a825035a2"
   dependencies:

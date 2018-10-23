@@ -29,7 +29,7 @@
     "nodemailer": "^4.6.5",
     "validate.js": "^0.12.0",
     "ws": "^3.3.3",
-    "zoapp-core": "0.12.3",
+    "zoapp-core": "0.13.0",
     "zoauth-server": "0.9.3"
   },
   "devDependencies": {

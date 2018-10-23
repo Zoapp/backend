@@ -4,11 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { createTransport } from "nodemailer";
-import validate from "validate.js";
 import AbstractController from "./abstractController";
 import TunnelProvider from "../utils/tunnelProvider";
-import emailConstraints from "../constraints/EmailParameters";
+// import emailConstraints from "../constraints/EmailParameters";
 
 export default class extends AbstractController {
   constructor(name, main, className) {
@@ -47,7 +45,7 @@ export default class extends AbstractController {
       }
     }
     // Init email service
-    await this.main.emailService.open();
+    await this.getEmailService().open();
   }
 
   async setup() {
@@ -163,8 +161,7 @@ export default class extends AbstractController {
       }
       // TODO remove tunnel stuff here and create a middleware dispatch for it
       logger.info("tunnel=", tunnel);
-      const backend =
-        (await this.getParameters().getValue("backend")) || {};
+      const backend = (await this.getParameters().getValue("backend")) || {};
       let prevTunnel = backend.tunnel;
       if (!prevTunnel) {
         prevTunnel = TunnelProvider.getActive(this.zoapp.pluginsManager) || {};
@@ -209,11 +206,11 @@ export default class extends AbstractController {
   }
 
   async configureMail(parameters) {
-    try {
+    /* try {
       await validate.async(parameters, emailConstraints);
     } catch (error) {
       throw new Error(error);
-    }
+    } */
 
     const smtpConfig = {
       host: parameters.host,
@@ -225,14 +222,19 @@ export default class extends AbstractController {
       },
     };
 
-    const transporter = createTransport(smtpConfig);
+    /* const transporter = createTransport(smtpConfig);
     try {
       await transporter.verify();
     } catch (error) {
       throw new Error("can't configure SMTP");
+    } */
+    try {
+      await this.getEmailService().open(smtpConfig);
+    } catch (error) {
+      throw new Error("can't configure SMTP");
     }
 
-    return this.setEmailParameters(parameters);
+    return this.setEmailParameters(smtpConfig);
   }
 
   async getEmailParameters() {
