@@ -47,7 +47,7 @@ const memDBConfig = {
     api: {
       endpoint: "/api",
       version: "1",
-      port: 8085,
+      port: 8087,
     },
   },
 };

@@ -53,6 +53,14 @@ class AbstractController {
       .getMiddlewares()
       .dispatchEvent(className, data, originId);
   }
+
+  getMainParameters() {
+    return this.main.getParameters();
+  }
+
+  getEmailService() {
+    return this.main.emailService;
+  }
 }
 
 export default AbstractController;

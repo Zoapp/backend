@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { dbCreate } from "zoapp-core";
+import { dbCreate, EmailService } from "zoapp-core";
 import zoauthServer, { AuthRouter } from "zoauth-server";
 import Controllers from "./controllers";
 import RouteBuilder from "./routes";
@@ -27,13 +27,40 @@ export class App {
     this.endpoint = App.buildAPIEndpoint(this.configuration);
 
     this.server = server;
-    this.authServer = App.zoauthServer(authConfig, server.app);
+    this.authServer = App.zoauthServer(authConfig, server.app, this);
     this.authRouter = AuthRouter(this.authServer);
 
     this.controllers = App.createMainControllers(this, this.configuration);
     this.pluginsManager = PluginsManager(this, this.configuration);
     this.wsRouter = WSRouterBuilder(this);
     RouteBuilder(this);
+
+    this.emailService = new EmailService();
+  }
+
+  sendChangedPassword(email) {
+    if (this.emailService) {
+      // TODO
+    }
+    logger.info(`TODO sendChangedPassword ${email}`);
+  }
+
+  sendResetPassword(email) {
+    if (this.emailService) {
+      // TODO
+    }
+    logger.info(`TODO sendResetPassword ${email}`);
+    return true;
+  }
+
+  sendUserCreated(email, username, validationPolicy) {
+    if (this.emailService) {
+      // TODO
+    }
+    logger.info(
+      `TODO sendUserCreated ${email} ${username} ${validationPolicy}`,
+    );
+    return true;
   }
 
   get name() {
@@ -87,7 +114,6 @@ export class App {
     } else {
       throw new Error("ConfigurationError: auth configuration not found");
     }
-
     return authConfig;
   }
 

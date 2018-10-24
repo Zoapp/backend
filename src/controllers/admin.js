@@ -4,11 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { createTransport } from "nodemailer";
-import validate from "validate.js";
 import AbstractController from "./abstractController";
 import TunnelProvider from "../utils/tunnelProvider";
-import emailConstraints from "../constraints/EmailParameters";
+// import emailConstraints from "../constraints/EmailParameters";
 
 export default class extends AbstractController {
   constructor(name, main, className) {
@@ -18,7 +16,7 @@ export default class extends AbstractController {
 
   async open() {
     await super.open();
-    const backend = (await this.main.getParameters().getValue("backend")) || {};
+    const backend = (await this.getMainParameters().getValue("backend")) || {};
     // TODO remove tunnel init here and create a middleware dispatch for it
     if (backend.tunnel) {
       const tunnel = backend.tunnel.active;
@@ -42,9 +40,14 @@ export default class extends AbstractController {
           backend.tunnel.active.subdomain = TunnelProvider.getActive(
             this.zoapp.pluginsManager,
           ).subdomain;
-          await this.main.getParameters().setValue("backend", backend);
+          await this.getMainParameters().setValue("backend", backend);
         }
       }
+    }
+    // Init email service
+    const emailService = this.getEmailService();
+    if (emailService) {
+      await this.getEmailService().open();
     }
   }
 
@@ -58,7 +61,7 @@ export default class extends AbstractController {
     const isAdmin = isMaster || scope === "admin";
     const parameters = {};
     // WIP get backend settings
-    parameters.backend = await this.main.getParameters().getValue("backend");
+    parameters.backend = await this.getMainParameters().getValue("backend");
     if (!parameters.backend) {
       parameters.backend = {};
     }
@@ -120,22 +123,18 @@ export default class extends AbstractController {
       parameters.backend.clientSecret = app.secret;
     }
 
-    // WIP get emailServer settings
-    parameters.emailServer = await this.main
-      .getParameters()
-      .getValue("emailServer");
-
-    if (!parameters.emailServer) {
-      parameters.emailServer = {};
-    }
-
     if (!isAdmin) {
-      delete parameters.emailServer;
       delete parameters.backend.apiUrl;
       delete parameters.backend.authUrl;
       delete parameters.backend.clientId;
       delete parameters.backend.clientSecret;
       delete parameters.backend.tunnel;
+    } else {
+      // WIP get emailServer settings
+      parameters.emailServer = await this.getEmailParameters();
+      if (!parameters.emailServer) {
+        parameters.emailServer = {};
+      }
     }
 
     // Enable multiProjects from config
@@ -166,7 +165,7 @@ export default class extends AbstractController {
       // TODO remove tunnel stuff here and create a middleware dispatch for it
       logger.info("tunnel=", tunnel);
       const backend =
-        (await this.main.getParameters().getValue("backend")) || {};
+        (await this.getMainParameters().getValue("backend")) || {};
       let prevTunnel = backend.tunnel;
       if (!prevTunnel) {
         prevTunnel = TunnelProvider.getActive(this.zoapp.pluginsManager) || {};
@@ -195,15 +194,15 @@ export default class extends AbstractController {
         }
         backend.tunnel = { active: { ...tunnel } };
         logger.info("backend.tunnel", backend.tunnel);
-        await this.main.getParameters().setValue("backend", backend);
+        await this.getMainParameters().setValue("backend", backend);
       }
     } else if (parameters.backend) {
-      const prevBackend = await this.main.getParameters().getValue("backend");
+      const prevBackend = await this.getMainParameters().getValue("backend");
       if (prevBackend.tunnel) {
         const p = parameters;
         p.backend.tunnel = prevBackend.tunnel;
       }
-      await this.main.getParameters().setValue("backend", parameters.backend);
+      await this.getMainParameters().setValue("backend", parameters.backend);
     } else if (parameters.emailServer) {
       await this.configureMail(parameters.emailServer);
     }
@@ -211,11 +210,11 @@ export default class extends AbstractController {
   }
 
   async configureMail(parameters) {
-    try {
+    /* try {
       await validate.async(parameters, emailConstraints);
     } catch (error) {
       throw new Error(error);
-    }
+    } */
 
     const smtpConfig = {
       host: parameters.host,
@@ -227,13 +226,26 @@ export default class extends AbstractController {
       },
     };
 
-    const transporter = createTransport(smtpConfig);
+    /* const transporter = createTransport(smtpConfig);
     try {
       await transporter.verify();
     } catch (error) {
-      throw new Error("impossible to configure SMTP");
+      throw new Error("can't configure SMTP");
+    } */
+    try {
+      await this.getEmailService().open(smtpConfig);
+    } catch (error) {
+      throw new Error("can't configure SMTP");
     }
 
-    this.main.getParameters().setValue("emailServer", parameters);
+    return this.setEmailParameters(smtpConfig);
+  }
+
+  async getEmailParameters() {
+    return this.getMainParameters().getValue("emailServer");
+  }
+
+  async setEmailParameters(parameters) {
+    return this.getMainParameters().setValue("emailServer", parameters);
   }
 }
