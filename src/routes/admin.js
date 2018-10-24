@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import ApiError from "zoauth-server/Error/ApiError";
+import ApiError from "zoauth-server/error/ApiError";
 import CommonRoutes from "./common";
 
 export default class extends CommonRoutes {
@@ -65,7 +65,9 @@ export default class extends CommonRoutes {
 
   async getParameterValue(context) {
     const { name, type } = context.getParams();
-    const value = await this.controller.getParameters().getValue(name, type);
+    const value = await this.controller
+      .getMainParameters()
+      .getValue(name, type);
     if (type) {
       logger.info("TODO type parameters translate");
     }

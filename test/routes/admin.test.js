@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import chai from "chai";
-import ApiError from "zoauth-server/Error/ApiError";
+import ApiError from "zoauth-server/error/ApiError";
 import Admin from "../../src/routes/admin";
 
 const { expect } = chai;
@@ -22,7 +22,7 @@ describe("admin", () => {
       };
 
       const controller = {
-        getParameters: () => parameters,
+        getMainParameters: () => parameters,
       };
 
       const admin = new Admin(controller);
@@ -41,7 +41,7 @@ describe("admin", () => {
       };
 
       const controller = {
-        getParameters: () => parameters,
+        getMainParameters: () => parameters,
       };
 
       const admin = new Admin(controller);

@@ -25,6 +25,7 @@ class MainController {
     this.authServer = zoapp.authServer;
     this.config = config;
     this.database = zoapp.database;
+    this.emailService = zoapp.emailService;
 
     this.users = new UsersController("Users", this);
     this.middlewares = new MiddlewaresController("Middlewares", this, "system");

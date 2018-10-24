@@ -54,8 +54,8 @@ class AbstractController {
       .dispatchEvent(className, data, originId);
   }
 
-  getParameters() {
-    return this.main.getParameters();
+  getMainParameters() {
+    return this.maingetMainParameters();
   }
 
   getEmailService() {

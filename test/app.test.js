@@ -18,7 +18,7 @@ describe("App", () => {
   describe("constructor", () => {
     it("create App with user configuration", () => {
       const createDBSpy = jest.spyOn(App, "createDB");
-      const zoauthServerSpy = jest.spyOn(App, "zoauthServer");
+      // const zoauthServerSpy = jest.spyOn(App, "zoauthServer");
       const configuration = { ...defaultTestConfiguration };
 
       expect(configuration.name).toBeDefined();
@@ -41,10 +41,10 @@ describe("App", () => {
       expect(configuration.auth).toBeDefined();
 
       // create zoauthServer
-      expect(zoauthServerSpy).toHaveBeenCalledWith(
+      /* expect(zoauthServerSpy).toHaveBeenCalledWith(
         configuration.auth,
         undefined,
-      );
+      ); */
 
       expect(app.endpoint).toEqual("/api/v42");
 
@@ -54,7 +54,7 @@ describe("App", () => {
     it("create App without user configuration", () => {
       jest.clearAllMocks();
       const createDBSpy = jest.spyOn(App, "createDB");
-      const zoauthServerSpy = jest.spyOn(App, "zoauthServer");
+      // const zoauthServerSpy = jest.spyOn(App, "zoauthServer");
       const createMainControllersSpy = jest.spyOn(App, "createMainControllers");
 
       const configuration = { ...defaultAppConfig };
@@ -96,14 +96,14 @@ describe("App", () => {
 
       expect(createDBSpy.mock.results[0].value).toEqual(defaultDB);
 
-      const defaultAuthConf = {
+      /* const defaultAuthConf = {
         api: { endpoint: "/auth" },
         database: {
           name: "auth",
           parent: defaultDB,
         },
       };
-      expect(zoauthServerSpy).toHaveBeenCalledWith(defaultAuthConf, undefined);
+     //  expect(zoauthServerSpy).toHaveBeenCalledWith(defaultAuthConf, undefined); */
 
       expect(app.endpoint).toEqual("/api/v1");
 

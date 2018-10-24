@@ -27,7 +27,7 @@ export class App {
     this.endpoint = App.buildAPIEndpoint(this.configuration);
 
     this.server = server;
-    this.authServer = App.zoauthServer(authConfig, server.app);
+    this.authServer = App.zoauthServer(authConfig, server.app, this);
     this.authRouter = AuthRouter(this.authServer);
 
     this.controllers = App.createMainControllers(this, this.configuration);
@@ -36,6 +36,31 @@ export class App {
     RouteBuilder(this);
 
     this.emailService = new EmailService();
+  }
+
+  sendChangedPassword(email) {
+    if (this.emailService) {
+      // TODO
+    }
+    logger.info(`TODO sendChangedPassword ${email}`);
+  }
+
+  sendResetPassword(email) {
+    if (this.emailService) {
+      // TODO
+    }
+    logger.info(`TODO sendResetPassword ${email}`);
+    return true;
+  }
+
+  sendUserCreated(email, username, validationPolicy) {
+    if (this.emailService) {
+      // TODO
+    }
+    logger.info(
+      `TODO sendUserCreated ${email} ${username} ${validationPolicy}`,
+    );
+    return true;
   }
 
   get name() {
