@@ -5495,17 +5495,10 @@ zoapp-core@0.13.0:
     nodemailer "4.6.8"
     winston "2.4.0"
 
-zoapp-core@^0.12.3:
-  version "0.12.3"
-  resolved "https://registry.yarnpkg.com/zoapp-core/-/zoapp-core-0.12.3.tgz#a62b796f055fe9bf85ed75fbd876a94a825035a2"
-  dependencies:
-    mysql2 "^1.5.1"
-    winston "2.4.0"
-
-zoauth-server@0.9.3:
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/zoauth-server/-/zoauth-server-0.9.3.tgz#b12ac58c5437119f24b7d22c2be8d7967832a27b"
+zoauth-server@0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/zoauth-server/-/zoauth-server-0.10.0.tgz#fb237e65c5752f8d2664abfcd6954e58a30482d0"
   dependencies:
     body-parser "^1.17.2"
     express "^4.15.3"
-    zoapp-core "^0.12.3"
+    zoapp-core "0.13.0"
