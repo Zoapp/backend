@@ -55,7 +55,7 @@ class AbstractController {
   }
 
   getMainParameters() {
-    return this.maingetMainParameters();
+    return this.main.getParameters();
   }
 
   getEmailService() {

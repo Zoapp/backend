@@ -45,7 +45,10 @@ export default class extends AbstractController {
       }
     }
     // Init email service
-    await this.getEmailService().open();
+    const emailService = this.getEmailService();
+    if (emailService) {
+      await this.getEmailService().open();
+    }
   }
 
   async setup() {
