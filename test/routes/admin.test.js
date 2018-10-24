@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import chai from "chai";
-import ApiError from "zoauth-server/error/ApiError";
+import ApiError from "zoauth-server/errors/ApiError";
 import Admin from "../../src/routes/admin";
 
 const { expect } = chai;
