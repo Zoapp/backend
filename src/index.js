@@ -6,6 +6,7 @@
  */
 import createZoapp from "./zoapp";
 import defaultAppConfig from "./defaultAppConfig";
+import { merge } from "lodash";
 
 const fs = require("fs");
 
@@ -18,9 +19,10 @@ try {
 }
 
 // merge default and user configuration
-const config = {
-  ...defaultAppConfig,
-  ...userConfig, // overide with userConfig data
-};
+const config = merge(
+  {},
+  defaultAppConfig,
+  userConfig, // overide with userConfig data
+);
 
 createZoapp(config).start();

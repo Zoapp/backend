@@ -9,48 +9,56 @@ import chai from "chai";
 import chaiHttp from "chai-http";
 import ApiServer from "../src/server";
 import AppFunc from "../src/app";
+import { merge } from "lodash";
 
 import defaultAppConfig from "../src/defaultAppConfig";
 
+global.jestExpect = global.expect;
 const { expect } = chai;
 
 chai.use(chaiHttp);
 
 setupLogger("test");
 
-const mysqlConfig = {
-  // Global Database
-  ...defaultAppConfig,
-  global: {
-    database: {
-      datatype: "mysql",
-      host: "localhost",
-      name: "zoapp_test",
-      user: "root",
-      charset: "utf8mb4",
-      version: "2",
-    },
-    api: {
-      endpoint: "/api",
-      version: "1",
-      port: 8085,
+const mysqlConfig = merge(
+  {},
+  {
+    // Global Database
+    ...defaultAppConfig,
+    global: {
+      database: {
+        datatype: "mysql",
+        host: "localhost",
+        name: "zoapp_test",
+        user: "root",
+        charset: "utf8mb4",
+        version: "2",
+      },
+      api: {
+        endpoint: "/api",
+        version: "1",
+        port: 8085,
+      },
     },
   },
-};
+);
 
-const memDBConfig = {
-  ...defaultAppConfig,
-  global: {
-    database: {
-      datatype: "memDatabase",
-    },
-    api: {
-      endpoint: "/api",
-      version: "1",
-      port: 8087,
+const memDBConfig = merge(
+  {},
+  {
+    ...defaultAppConfig,
+    global: {
+      database: {
+        datatype: "memDatabase",
+      },
+      api: {
+        endpoint: "/api",
+        version: "1",
+        port: 8087,
+      },
     },
   },
-};
+);
 
 // init : create app / users / auth / token
 const initService = async (ctx, params, commons, envs) => {
@@ -113,7 +121,7 @@ const initService = async (ctx, params, commons, envs) => {
   return context;
 };
 
-const buildUrl = (ctx, route, token = null) => {
+const buildApiUrl = (ctx, route, token = null) => {
   // logger.info("context=", context);
   let url = ctx.endpoint + route;
   if (token) {
@@ -139,7 +147,7 @@ const result = (res, callback = null) => {
 const getAsync = async (context, route, token = null) => {
   const res = await chai
     .request(context.server)
-    .get(buildUrl(context, route, token))
+    .get(buildApiUrl(context, route, token))
     .set("Accept", "application/json");
   return result(res);
 };
@@ -180,7 +188,7 @@ const commonDatasets = { password: "12345" };
 [
   { title: "MemDataset", config: memDBConfig },
   { title: "MySQLDataset", config: mysqlConfig },
-].forEach((param) => {
+].forEach(param => {
   describe(`API using ${param.title}`, () => {
     beforeAll(async () => {
       context = await initService({}, param, commonDatasets);
@@ -272,6 +280,10 @@ describe("API env variables", () => {
   const param = { config: memDBConfig };
 
   describe("/admin", () => {
+    afterEach(async () => {
+      await context.app.database.delete();
+      await context.app.close();
+    });
     it("should return correct params on /admin GET", async () => {
       context = await initService({}, param, commonDatasets, {
         ZOAPP_PUBLIC_URL: "https://my.opla.domain/public_api",
@@ -289,13 +301,210 @@ describe("API env variables", () => {
       expect(res).to.nested.include({
         "params.backend.apiUrl": "https://my.opla.domain/api",
       });
-      expect(res).to.nested.include({
-        "params.backend.authUrl": "https://my.opla.domain/auth",
-      });
     });
   });
 
+  describe("/management", () => {
+    afterEach(async () => {
+      await context.app.database.delete();
+      await context.app.close();
+    });
+    it("should return 404 on /management by default", async () => {
+      context = await initService({}, param, commonDatasets, {});
+      const res = await chai
+        .request(context.server)
+        .get(
+          buildApiUrl(
+            context,
+            "/management/users",
+            context.authUser1.access_token,
+          ),
+        )
+        .set("Accept", "application/json")
+        .then(() => fail("Should not get reached."))
+        .catch(err => {
+          expect(err.response).to.have.status(404);
+        });
+    });
+
+    it("should return 200 on /management when enabled", async () => {
+      let paramsWithManagementApi = merge({}, param, {
+        config: {
+          backend: {
+            managementEndpoint: true,
+          },
+        },
+      });
+      context = await initService(
+        {},
+        paramsWithManagementApi,
+        commonDatasets,
+        {},
+      );
+      const url = buildApiUrl(context, "/management");
+      const res = await chai
+        .request(context.server)
+        .get(url)
+        .set("Accept", "application/json");
+      expect(res).to.have.status(200);
+    });
+
+    it("should return 200 on /management when enabled", async () => {
+      let paramsWithManagementApi = merge({}, param, {
+        config: {
+          backend: {
+            managementEndpoint: true,
+          },
+        },
+      });
+      context = await initService(
+        {},
+        paramsWithManagementApi,
+        commonDatasets,
+        {},
+      );
+      const url = buildApiUrl(context, "/management");
+      const res = await chai
+        .request(context.server)
+        .get(url)
+        .set("Accept", "application/json");
+      expect(res).to.have.status(200);
+    });
+  });
   afterAll(async () => {
+    await context.app.database.delete();
+    await context.app.close();
+  });
+});
+
+describe("API env variables", () => {
+  it("should create a user", async () => {
+    const param = { config: mysqlConfig };
+
+    let paramsWithManagementApi = merge({}, param, {
+      config: {
+        backend: {
+          managementEndpoint: true,
+        },
+      },
+    });
+    context = await initService(
+      {},
+      paramsWithManagementApi,
+      commonDatasets,
+      {},
+    );
+    const userResp = await chai
+      .request(context.server)
+      .post(buildApiUrl(context, "/management/users"))
+      .send({
+        username: "username",
+        password: "password",
+        email: "email@opla.ai",
+        clientId: context.application.client_id,
+        clientSecret: context.application.client_secret,
+      })
+      .set("Accept", "application/json");
+
+    const resp = await chai
+      .request(context.server)
+      .get(buildApiUrl(context, "/management/users"))
+      .set("Accept", "application/json");
+
+    jestExpect(resp.body).toContainEqual(
+      jestExpect.objectContaining({
+        id: userResp.body.userId,
+        username: "username",
+      }),
+    );
+  });
+
+  it("should approve a user and allow login", async () => {
+    const param = { config: mysqlConfig };
+
+    let paramsWithManagementApi = merge({}, param, {
+      config: {
+        backend: {
+          managementEndpoint: true,
+        },
+      },
+    });
+    context = await initService(
+      {},
+      paramsWithManagementApi,
+      commonDatasets,
+      {},
+    );
+    const userResp = await chai
+      .request(context.server)
+      .post(buildApiUrl(context, "/management/users"))
+      .send({
+        username: "username",
+        password: "password",
+        email: "email@opla.ai",
+        clientId: context.application.client_id,
+        clientSecret: context.application.client_secret,
+      })
+      .set("Accept", "application/json");
+
+    // Before approval, this should fail
+    const notApprovedTokenReponse = await chai
+      .request(context.server)
+      .post("/auth/access_token/")
+      .send({
+        username: "username",
+        password: "password",
+        client_id: context.application.client_id,
+        redirect_uri: "localhost",
+        grant_type: "password",
+      })
+      .then(() => fail("Should not get reached."))
+      .catch(err => {
+        expect(err.response).to.have.status(400);
+      });
+
+    const approveResp = await chai
+      .request(context.server)
+      .post(buildApiUrl(context, "/management/users/approve"))
+      .send({
+        userId: userResp.body.userId,
+        clientId: context.application.client_id,
+        clientSecret: context.application.client_secret,
+      })
+      .set("Accept", "application/json");
+      expect(approveResp).to.have.status(200);
+
+    // Try to get token, that should work.
+    const approvedTokenResponse = await chai
+      .request(context.server)
+      .post("/auth/access_token/")
+      .send({
+        username: "username",
+        password: "password",
+        client_id: context.application.client_id,
+        redirect_uri: "localhost",
+        grant_type: "password",
+      });
+    jestExpect(approvedTokenResponse.body).toMatchObject({
+      scope: "owner",
+      access_token: jestExpect.any(String),
+      expires_in: jestExpect.any(Number),
+    });
+
+    const resp = await chai
+      .request(context.server)
+      .get(buildApiUrl(context, "/management/users"))
+      .set("Accept", "application/json");
+
+    jestExpect(resp.body).toContainEqual(
+      jestExpect.objectContaining({
+        id: userResp.body.userId,
+        username: "username",
+      }),
+    );
+  });
+
+  afterEach(async () => {
     await context.app.database.delete();
     await context.app.close();
   });

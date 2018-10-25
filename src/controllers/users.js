@@ -17,18 +17,18 @@ export default class extends AbstractController {
     return this.model.getUserProfile(id);
   }
 
-  async getProfile(params) {
+  async getProfile(params, doNotCreate = false) {
     let profile = null;
-    if (params.user && params.user.provider) {
+    if (params.user && params.user.provider && !doNotCreate) {
       const self = this;
-      this.applyMiddleware("getUserProfile", params.user, async (result) => {
+      this.applyMiddleware("getUserProfile", params.user, async result => {
         profile = await self.model.storeProfile(result);
         // await self.dispatch("updateUserProfile", profile);
       });
     } else if (params.user) {
       // make sure user.id is valid
       const user = await this.main.getUser(params.user.id);
-      if (user) {
+      if (user && !doNotCreate) {
         profile = await this.model.createProfile(user);
       }
       // await this.dispatch("updateUserProfile", profile);
@@ -36,7 +36,7 @@ export default class extends AbstractController {
 
     if (!profile && params.id) {
       profile = await this.model.getProfile(params.id);
-      if (!profile) {
+      if (!profile && !doNotCreate) {
         const user = await this.main.getUser(params.id);
         if (user) {
           profile = await this.model.createProfile(user);
@@ -49,21 +49,24 @@ export default class extends AbstractController {
   }
 
   async getUsers(excludedUser) {
-    const result = await this.main.authServer.getUsers();
+    let result = await this.main.authServer.getUsers();
+    if (excludedUser) {
+      result = result.filter(user => user.id !== excludedUser.id);
+    }
 
     return Promise.all(
-      result.filter((user) => user.id !== excludedUser.id).map(async (u) => {
+      result.map(async u => {
         const user = { ...u };
         delete user.password;
 
-        const profile = await this.getProfile({ id: user.id });
+        const profile = await this.getProfile({ id: user.id }, true);
 
         if (profile) {
           user.avatar = profile.avatar;
         }
 
         return user;
-      }),
+      })
     );
   }
 
