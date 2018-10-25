@@ -6,12 +6,15 @@
  */
 import AdminRoutes from "./admin";
 import UsersRoutes from "./users";
+import ManagementRoutes from "./management";
 import CommonRoutes from "./common";
 
-export default (zoapp) => {
+export default zoapp => {
   const common = new CommonRoutes(zoapp.controllers);
   const admin = new AdminRoutes(zoapp.controllers);
   const users = new UsersRoutes(zoapp.controllers);
+  const management = new ManagementRoutes(zoapp.controllers);
+  const config = zoapp.controllers.getParameters().config;
 
   // / routes
   let route = zoapp.createRoute("/");
@@ -90,4 +93,13 @@ export default (zoapp) => {
     ["admin", "master", "application"],
     admin.getParameterValue,
   );
+
+  if (config.backend.managementEndpoint === true) {
+    //management routes
+    route = zoapp.createRoute("/management");
+    route.add("GET", "/", ["open"], () => ({ status: "active" }));
+    route.add("GET", "/users", ["open"], management.listUsers);
+    route.add("POST", "/users", ["open"], management.createUser);
+    route.add("POST", "/users/approve/", ["open"], management.approveUser);
+  }
 };

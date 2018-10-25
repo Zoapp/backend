@@ -7,6 +7,7 @@
 import UsersController from "./users";
 import MiddlewaresController from "./middlewares";
 import AdminController from "./admin";
+import ManagementController from "./management";
 import Parameters from "../models/parameters";
 
 /**
@@ -30,6 +31,7 @@ class MainController {
     this.users = new UsersController("Users", this);
     this.middlewares = new MiddlewaresController("Middlewares", this, "system");
     this.admin = new AdminController("Admin", this);
+    this.management = new ManagementController("Management", this);
 
     this.parameters = new Parameters(this.database, this.config);
   }
@@ -41,6 +43,7 @@ class MainController {
     await this.middlewares.open();
     await this.admin.open();
     await this.users.open();
+    await this.management.open();
   }
 
   async stop() {
@@ -48,6 +51,7 @@ class MainController {
     await this.users.close();
     await this.middlewares.close();
     await this.parameters.close();
+    await this.management.close();
   }
 
   async isMultiProjects(userId, scope = "anonymous") {
@@ -125,6 +129,10 @@ class MainController {
 
   getUsers() {
     return this.users;
+  }
+
+  getManagement() {
+    return this.management;
   }
 
   getAdmin() {
