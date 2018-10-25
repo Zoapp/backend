@@ -9,15 +9,17 @@ import AbstractPlugin from "../abstractPlugin";
 
 class LocalTunnel extends AbstractPlugin {
   constructor() {
-    super("localtunnel", null, "TunnelProvider", [], null);
+    super({ name: "localtunnel", type: "TunnelProvider" });
     this.tunnel = null;
     this.listener = null;
   }
 
+  // legacy
   getName() {
     return this.name;
   }
 
+  // legacy
   getType() {
     return this.type;
   }
@@ -33,7 +35,7 @@ class LocalTunnel extends AbstractPlugin {
     }
   }
 
-  async registerMiddleware(params) {
+  async onMiddlewareRegister(params) {
     // WIP
     const { port, ...options } = params;
     return new Promise((resolve, reject) => {
@@ -59,13 +61,21 @@ class LocalTunnel extends AbstractPlugin {
     });
   }
 
-  async unregisterMiddleware() {
+  async onMiddlewareUnregister() {
     return new Promise((resolve) => {
       if (this.tunnel) {
         this.tunnel.close();
       }
       resolve();
     });
+  }
+
+  getMiddlewareDefaultProperties() {
+    const mdp = super.getMiddlewareDefaultProperties();
+    return {
+      ...mdp,
+      status: "disabled",
+    };
   }
 }
 

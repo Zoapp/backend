@@ -26,6 +26,9 @@ class PluginsController extends AbstractController {
     super(name, main, className);
     this.plugins = {};
 
+    this.add = this.add.bind(this);
+    this.remove = this.remove.bind(this);
+    this.length = this.length.bind(this);
     this.init();
   }
 

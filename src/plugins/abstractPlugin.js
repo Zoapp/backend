@@ -9,7 +9,7 @@
  * Abstract class representing a plugin
  */
 class AbstractPlugin {
-  constructor({ name, title, type, classes, icon, ...optionals }) {
+  constructor({ name, title, type, classes = [], icon, ...optionals }) {
     this.pluginProperties = {
       name,
       title,
