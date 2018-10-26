@@ -94,9 +94,13 @@ export default zoapp => {
     admin.getParameterValue,
   );
 
-  if (config.backend.managementEndpoint === true) {
+  if (config.global.management_endpoint) {
+    logger.warn(`
+        Management endpoint enabled at '${config.global.management_endpoint}'
+    >>  MAKE SURE THIS IS NOT PUBLICLY ACCESSIBLE !`,
+    );
     //management routes
-    route = zoapp.createRoute("/management");
+    route = zoapp.createRoute(config.global.management_endpoint);
     route.add("GET", "/", ["open"], () => ({ status: "active" }));
     route.add("GET", "/users", ["open"], management.listUsers);
     route.add("POST", "/users", ["open"], management.createUser);

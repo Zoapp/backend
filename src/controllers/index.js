@@ -37,9 +37,9 @@ class MainController {
   }
 
   async start() {
-    const { buildSchema } = this.config;
+    const { build_schema } = this.config;
 
-    await this.parameters.open(buildSchema);
+    await this.parameters.open(build_schema);
     await this.middlewares.open();
     await this.admin.open();
     await this.users.open();

@@ -1,3 +1,5 @@
+const httpPort = 8081 || process.env.PORT;
+
 const defaultAppConfig = {
   name: "Zoapp backend",
   version: "0.1.0",
@@ -16,12 +18,10 @@ const defaultAppConfig = {
       version: "1",
       port: 8081,
     },
-  },
-  backend: {
-    managementEndpoint: process.env.ZOAPP_MANAGEMENT_ENDPOINT === "true",
-    publicUrl: process.env.ZOAPP_PUBLIC_URL,
-    apiUrl: process.env.ZOAPP_API_URL,
-    authUrl: process.env.ZOAPP_AUTH_URL,
+    management_endpoint: false,
+    public_url: `http://localhost:${httpPort}/`,
+    api_url: `http://localhost:${httpPort}/api/v1/`,
+    auth_url: `http://localhost:${httpPort}/auth/`,
   },
   auth: {
     database: {
@@ -56,7 +56,7 @@ const defaultAppConfig = {
       name: "parameters",
     },
   },
-  buildSchema: true,
+  build_schema: true,
 };
 
 export default defaultAppConfig;
