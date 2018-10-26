@@ -130,6 +130,10 @@ To override `global.database.host`, inject the following env variable : `ZOAPP__
 
 As a consequence, use `_` rather than camelCase in config keys.
 
+### Config sources & priorities
+1. Environment vars starting with `ZOAPP_`
+2. Config in `createZoapp(config, ...)`
+3. Fallback to `./src/defaultAppConfig.js`
 
 ## Contributor Code of Conduct
 
