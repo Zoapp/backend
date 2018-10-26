@@ -78,13 +78,12 @@ export default class extends AbstractController {
       );
     }
 
-    // Override with env variables.
-    parameters.backend.publicUrl =
-      process.env.ZOAPP_PUBLIC_URL || parameters.backend.publicUrl;
-    parameters.backend.apiUrl =
-      process.env.ZOAPP_API_URL || parameters.backend.apiUrl;
-    parameters.backend.authUrl =
-      process.env.ZOAPP_AUTH_URL || parameters.backend.authUrl;
+    // Get backend url params from config.
+    const cfg = this.main.config;
+    parameters.backend.publicUrl = cfg.global.public_url;
+    parameters.backend.apiUrl = cfg.global.api_url;
+    parameters.backend.authUrl = cfg.global.auth_url;
+    parameters.backend.managementEndpoint = cfg.global.management_endpoint;
 
     if (!parameters.backend.publicUrl) {
       logger.info("tunnel.active=", parameters.backend.tunnel.active);
@@ -96,7 +95,6 @@ export default class extends AbstractController {
       }
     }
 
-    const cfg = this.main.config;
     if (!parameters.backend.apiUrl) {
       parameters.backend.apiUrl = [
         `${cfg.global.api.ip}:${cfg.global.api.port}`,

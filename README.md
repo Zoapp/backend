@@ -122,6 +122,18 @@ you can directly use its name:
 $ yarn add zrmc
 ```
 
+## Configuration
+There is a default configuration that lies in `src/defaultAppConfig.js`.
+This default configuration can be overriden by passing a config object to the `createZoapp` function.
+It also can be overriden with environment variables like the following :
+To override `global.database.host`, inject the following env variable : `ZOAPP__GLOBAL__DATABASE__HOST`.
+
+As a consequence, use `_` rather than camelCase in config keys.
+
+### Config sources & priorities
+1. Environment vars starting with `ZOAPP_`
+2. Config in `createZoapp(config, ...)`
+3. Fallback to `./src/defaultAppConfig.js`
 
 ## Contributor Code of Conduct
 

@@ -13,7 +13,7 @@ jest.mock("../src/routes");
 
 describe("App", () => {
   const defaultTestConfiguration = JSON.parse(`
-    {"name":"Opla.ai","version":"0.1.0","global":{"database":{"datatype":"mysql","host":"127.0.0.1","name":"opla_dev","user":"root","password":"","charset":"utf8mb4","version":"2"},"api":{"endpoint":"/api","version":"42","port":8081},"botSite":{"url":"/publish/"},"gateway":{"url":"https://gateway.opla.ai"}},"auth":{"database":{"parent":"global","name":"auth"},"api":{"endpoint":"/auth"}},"messenger":{"database":{"parent":"global","name":"messenger"}},"users":{"database":{"parent":"global","name":"users"}},"bots":{"database":{"parent":"global","name":"bots"}},"webhooks":{"database":{"parent":"global","name":"webhooks"}},"middlewares":{"database":{"parent":"global","name":"middlewares"}},"parameters":{"database":{"parent":"global","name":"parameters"}},"buildSchema":false}
+    {"name":"Opla.ai","version":"0.1.0","global":{"database":{"datatype":"mysql","host":"127.0.0.1","name":"opla_dev","user":"root","password":"","charset":"utf8mb4","version":"2"},"api":{"endpoint":"/api","version":"42","port":8081},"botSite":{"url":"/publish/"},"gateway":{"url":"https://gateway.opla.ai"}},"auth":{"database":{"parent":"global","name":"auth"},"api":{"endpoint":"/auth"}},"messenger":{"database":{"parent":"global","name":"messenger"}},"users":{"database":{"parent":"global","name":"users"}},"bots":{"database":{"parent":"global","name":"bots"}},"webhooks":{"database":{"parent":"global","name":"webhooks"}},"middlewares":{"database":{"parent":"global","name":"middlewares"}},"parameters":{"database":{"parent":"global","name":"parameters"}},"build_schema":false}
   `);
   describe("constructor", () => {
     it("create App with user configuration", () => {
@@ -24,7 +24,7 @@ describe("App", () => {
       expect(configuration.name).toBeDefined();
       expect(configuration.global).toBeDefined();
       expect(configuration.global.database).toBeDefined();
-      expect(configuration.buildSchema).toBeDefined();
+      expect(configuration.build_schema).toBeDefined();
 
       expect(configuration.api).not.toBeDefined();
       expect(configuration.global.api).toBeDefined();
@@ -33,7 +33,7 @@ describe("App", () => {
       const app = new App(configuration, {});
 
       expect(app.buildSchema).toEqual(false);
-      expect(configuration.buildSchema).toBeDefined();
+      expect(configuration.build_schema).toBeDefined();
 
       // create database
       expect(createDBSpy).toHaveBeenCalledWith(configuration);
@@ -63,7 +63,7 @@ describe("App", () => {
       const app = new App(configuration, {});
 
       expect(app.buildSchema).toEqual(true);
-      expect(configuration.buildSchema).toBeDefined();
+      expect(configuration.build_schema).toBeDefined();
 
       // build database
       expect(createDBSpy).toHaveBeenCalledWith(defaultAppConfig);

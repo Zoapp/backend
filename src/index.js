@@ -10,12 +10,12 @@ import { merge } from "lodash";
 
 const fs = require("fs");
 
-// load config/default.json configuration if present.
+// load config.json configuration if present.
 let userConfig = {};
 try {
-  userConfig = JSON.parse(fs.readFileSync("config/default.json"));
+  userConfig = JSON.parse(fs.readFileSync("config.json"));
 } catch (error) {
-  logger.info("No config/default.json file provided");
+  logger.info("No config.json file provided, falling back to default config.");
 }
 
 // merge default and user configuration

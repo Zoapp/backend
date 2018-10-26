@@ -12,6 +12,7 @@ import AppFunc from "../src/app";
 import { merge } from "lodash";
 
 import defaultAppConfig from "../src/defaultAppConfig";
+import { createConfig } from "../src/zoapp";
 
 global.jestExpect = global.expect;
 const { expect } = chai;
@@ -73,6 +74,7 @@ const initService = async (ctx, params, commons, envs) => {
     ...process.env,
     ...envs,
   };
+  config = createConfig(config, process.env);
   // logger.info("config=", config);
   const apiServer = ApiServer(config);
   const app = AppFunc(config, apiServer);
@@ -285,16 +287,21 @@ describe("API env variables", () => {
       await context.app.close();
     });
     it("should return correct params on /admin GET", async () => {
-      context = await initService({}, param, commonDatasets, {
-        ZOAPP_PUBLIC_URL: "https://my.opla.domain/public_api",
-        ZOAPP_API_URL: "https://my.opla.domain/api",
-        ZOAPP_AUTH_URL: "https://my.opla.domain/auth",
+      let param2 = merge({}, param, {
+        config: {
+          global: {
+            public_url: "https://my.opla.domain/public_api",
+            api_url: "https://my.opla.domain/api",
+            auth_url: "https://my.opla.domain/auth",
+          },
+        },
       });
+      context = await initService({}, param2, commonDatasets, {});
       const res = await getAsync(
         context,
         "/admin",
         context.authUser1.access_token,
-      );
+      )
       expect(res).to.nested.include({
         "params.backend.publicUrl": "https://my.opla.domain/public_api",
       });
@@ -328,13 +335,7 @@ describe("API env variables", () => {
     });
 
     it("should return 200 on /management when enabled", async () => {
-      let paramsWithManagementApi = merge({}, param, {
-        config: {
-          backend: {
-            managementEndpoint: true,
-          },
-        },
-      });
+      let paramsWithManagementApi = addManagementEndpoint(param);
       context = await initService(
         {},
         paramsWithManagementApi,
@@ -350,13 +351,7 @@ describe("API env variables", () => {
     });
 
     it("should return 200 on /management when enabled", async () => {
-      let paramsWithManagementApi = merge({}, param, {
-        config: {
-          backend: {
-            managementEndpoint: true,
-          },
-        },
-      });
+      let paramsWithManagementApi = addManagementEndpoint(param);
       context = await initService(
         {},
         paramsWithManagementApi,
@@ -380,14 +375,7 @@ describe("API env variables", () => {
 describe("API env variables", () => {
   it("should create a user", async () => {
     const param = { config: mysqlConfig };
-
-    let paramsWithManagementApi = merge({}, param, {
-      config: {
-        backend: {
-          managementEndpoint: true,
-        },
-      },
-    });
+    let paramsWithManagementApi = addManagementEndpoint(param);
     context = await initService(
       {},
       paramsWithManagementApi,
@@ -421,14 +409,8 @@ describe("API env variables", () => {
 
   it("should approve a user and allow login", async () => {
     const param = { config: mysqlConfig };
+    let paramsWithManagementApi = addManagementEndpoint(param);
 
-    let paramsWithManagementApi = merge({}, param, {
-      config: {
-        backend: {
-          managementEndpoint: true,
-        },
-      },
-    });
     context = await initService(
       {},
       paramsWithManagementApi,
@@ -472,7 +454,7 @@ describe("API env variables", () => {
         clientSecret: context.application.client_secret,
       })
       .set("Accept", "application/json");
-      expect(approveResp).to.have.status(200);
+    expect(approveResp).to.have.status(200);
 
     // Try to get token, that should work.
     const approvedTokenResponse = await chai
@@ -509,3 +491,13 @@ describe("API env variables", () => {
     await context.app.close();
   });
 });
+
+function addManagementEndpoint(param) {
+  return merge({}, param, {
+    config: {
+      global: {
+        management_endpoint: "/management",
+      },
+    },
+  });
+}

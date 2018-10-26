@@ -29,9 +29,9 @@ class AbstractController {
 
   async open() {
     if (this.model) {
-      const { buildSchema } = this.main.config;
+      const { build_schema } = this.main.config;
 
-      await this.model.open(buildSchema);
+      await this.model.open(build_schema);
     }
   }
 

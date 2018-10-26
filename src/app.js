@@ -72,7 +72,7 @@ export class App {
   }
 
   get buildSchema() {
-    return this.configuration.buildSchema;
+    return this.configuration.build_schema;
   }
 
   /**
