@@ -10,9 +10,7 @@ cache: yarn
 
 install: yarn
 script:
-  # we do not run lint because of a missing src/config.js file, cf.
-  # https://github.com/Zoapp/backend/issues/9
-  #- yarn lint
+  - yarn lint
   - yarn test
 
 jobs:
