@@ -5,13 +5,31 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { setupLogger } from "zoapp-core";
+import _ from "lodash";
 import createApiServer from "./server";
 import createApp from "./app";
 import Controller from "./controllers/abstractController";
 import Model from "./models/abstractModel";
 import CommonRoutes from "./routes/common";
 import defaultAppConfig from "./defaultAppConfig";
-import _ from "lodash";
+
+/* eslint-disable */
+const createConfig = (configOverride, env) => {
+  // Config priority is :
+  // 1. Environment vars starting with ZOAPP_
+  // 2. Config in configOverride
+  // 3. Fallback to ./defaultAppConfig
+  let finalConfig = defaultAppConfig;
+  finalConfig = _.merge({}, finalConfig, configOverride);
+  for (const envKey in _.pickBy(env, (v, k) => k.startsWith("ZOAPP__"))) {
+    if (env.hasOwnProperty(envKey)) {
+      const splittedKey = envKey.split("__").splice(1);
+      _.set(finalConfig, splittedKey.join(".").toLowerCase(), env[envKey]);
+    }
+  }
+  return finalConfig;
+};
+/* eslint-enable */
 
 const createZoapp = (configOverride, log = "debug") => {
   setupLogger(log);
@@ -32,22 +50,6 @@ const createZoapp = (configOverride, log = "debug") => {
   process.on("SIGINT", shutdown);
 
   return app;
-};
-
-const createConfig = (configOverride, env) => {
-  // Config priority is :
-  // 1. Environment vars starting with ZOAPP_
-  // 2. Config in configOverride
-  // 3. Fallback to ./defaultAppConfig
-  let finalConfig = defaultAppConfig;
-  finalConfig = _.merge({}, finalConfig, configOverride);
-  for (const envKey in _.pickBy(env, (v, k) => k.startsWith("ZOAPP__"))) {
-    if (env.hasOwnProperty(envKey)) {
-      const splittedKey = envKey.split("__").splice(1);
-      _.set(finalConfig, splittedKey.join(".").toLowerCase(), env[envKey]);
-    }
-  }
-  return finalConfig;
 };
 
 export { Controller, Model, CommonRoutes, defaultAppConfig, createConfig };

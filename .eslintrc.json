@@ -11,14 +11,12 @@
         "node": true
     },
     "globals": {
-        "logger": true
+        "logger": true,
+        "jestExpect": true
     },
     "parser": "babel-eslint",
     "parserOptions": {
         "ecmaVersion": 6,
-        "ecmaFeatures": {
-            "experimentalObjectRestSpread": true
-        },
         "sourceType": "module"
     },
     "plugins": [
@@ -40,6 +38,7 @@
         "prettier/prettier": ["error", {
             "arrowParens": "always",
             "trailingComma": "all"
-        }]
+        }],
+        "camelcase": ["error", {"properties": "never", "ignoreDestructuring": true}]
     }
 }

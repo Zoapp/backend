@@ -7,9 +7,9 @@
 import { setupLogger } from "zoapp-core";
 import chai from "chai";
 import chaiHttp from "chai-http";
+import { merge } from "lodash";
 import ApiServer from "../src/server";
 import AppFunc from "../src/app";
-import { merge } from "lodash";
 
 import defaultAppConfig from "../src/defaultAppConfig";
 import { createConfig } from "../src/zoapp";
@@ -184,13 +184,23 @@ const deleteAsync = async (context, route, token) => {
 };
 */
 
+function addManagementEndpoint(param) {
+  return merge({}, param, {
+    config: {
+      global: {
+        management_endpoint: "/management",
+      },
+    },
+  });
+}
+
 let context = null;
 const commonDatasets = { password: "12345" };
 
 [
   { title: "MemDataset", config: memDBConfig },
   { title: "MySQLDataset", config: mysqlConfig },
-].forEach(param => {
+].forEach((param) => {
   describe(`API using ${param.title}`, () => {
     beforeAll(async () => {
       context = await initService({}, param, commonDatasets);
@@ -287,7 +297,7 @@ describe("API env variables", () => {
       await context.app.close();
     });
     it("should return correct params on /admin GET", async () => {
-      let param2 = merge({}, param, {
+      const param2 = merge({}, param, {
         config: {
           global: {
             public_url: "https://my.opla.domain/public_api",
@@ -301,7 +311,7 @@ describe("API env variables", () => {
         context,
         "/admin",
         context.authUser1.access_token,
-      )
+      );
       expect(res).to.nested.include({
         "params.backend.publicUrl": "https://my.opla.domain/public_api",
       });
@@ -316,9 +326,9 @@ describe("API env variables", () => {
       await context.app.database.delete();
       await context.app.close();
     });
-    it("should return 404 on /management by default", async () => {
+    it("should return 404 on /management by default", async (done) => {
       context = await initService({}, param, commonDatasets, {});
-      const res = await chai
+      await chai
         .request(context.server)
         .get(
           buildApiUrl(
@@ -328,14 +338,15 @@ describe("API env variables", () => {
           ),
         )
         .set("Accept", "application/json")
-        .then(() => fail("Should not get reached."))
-        .catch(err => {
+        .then(() => done.fail("Should not get reached."))
+        .catch((err) => {
           expect(err.response).to.have.status(404);
         });
+      done();
     });
 
     it("should return 200 on /management when enabled", async () => {
-      let paramsWithManagementApi = addManagementEndpoint(param);
+      const paramsWithManagementApi = addManagementEndpoint(param);
       context = await initService(
         {},
         paramsWithManagementApi,
@@ -351,7 +362,7 @@ describe("API env variables", () => {
     });
 
     it("should return 200 on /management when enabled", async () => {
-      let paramsWithManagementApi = addManagementEndpoint(param);
+      const paramsWithManagementApi = addManagementEndpoint(param);
       context = await initService(
         {},
         paramsWithManagementApi,
@@ -375,7 +386,7 @@ describe("API env variables", () => {
 describe("API env variables", () => {
   it("should create a user", async () => {
     const param = { config: mysqlConfig };
-    let paramsWithManagementApi = addManagementEndpoint(param);
+    const paramsWithManagementApi = addManagementEndpoint(param);
     context = await initService(
       {},
       paramsWithManagementApi,
@@ -407,9 +418,9 @@ describe("API env variables", () => {
     );
   });
 
-  it("should approve a user and allow login", async () => {
+  it("should approve a user and allow login", async (done) => {
     const param = { config: mysqlConfig };
-    let paramsWithManagementApi = addManagementEndpoint(param);
+    const paramsWithManagementApi = addManagementEndpoint(param);
 
     context = await initService(
       {},
@@ -430,7 +441,7 @@ describe("API env variables", () => {
       .set("Accept", "application/json");
 
     // Before approval, this should fail
-    const notApprovedTokenReponse = await chai
+    await chai
       .request(context.server)
       .post("/auth/access_token/")
       .send({
@@ -440,8 +451,8 @@ describe("API env variables", () => {
         redirect_uri: "localhost",
         grant_type: "password",
       })
-      .then(() => fail("Should not get reached."))
-      .catch(err => {
+      .then(() => done.fail("Should not get reached."))
+      .catch((err) => {
         expect(err.response).to.have.status(400);
       });
 
@@ -484,6 +495,7 @@ describe("API env variables", () => {
         username: "username",
       }),
     );
+    done();
   });
 
   afterEach(async () => {
@@ -491,13 +503,3 @@ describe("API env variables", () => {
     await context.app.close();
   });
 });
-
-function addManagementEndpoint(param) {
-  return merge({}, param, {
-    config: {
-      global: {
-        management_endpoint: "/management",
-      },
-    },
-  });
-}

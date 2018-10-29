@@ -119,6 +119,7 @@ class MainController {
   async getApplication(clientId) {
     return this.authServer.getApplication(clientId);
   }
+
   async getMe(id) {
     return this.getUser(id);
   }
