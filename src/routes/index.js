@@ -9,12 +9,12 @@ import UsersRoutes from "./users";
 import ManagementRoutes from "./management";
 import CommonRoutes from "./common";
 
-export default zoapp => {
+export default (zoapp) => {
   const common = new CommonRoutes(zoapp.controllers);
   const admin = new AdminRoutes(zoapp.controllers);
   const users = new UsersRoutes(zoapp.controllers);
   const management = new ManagementRoutes(zoapp.controllers);
-  const config = zoapp.controllers.getParameters().config;
+  const { config } = zoapp.controllers.getParameters();
 
   // / routes
   let route = zoapp.createRoute("/");
@@ -97,9 +97,8 @@ export default zoapp => {
   if (config.global.management_endpoint) {
     logger.warn(`
         Management endpoint enabled at '${config.global.management_endpoint}'
-    >>  MAKE SURE THIS IS NOT PUBLICLY ACCESSIBLE !`,
-    );
-    //management routes
+    >>  MAKE SURE THIS IS NOT PUBLICLY ACCESSIBLE !`);
+    // management routes
     route = zoapp.createRoute(config.global.management_endpoint);
     route.add("GET", "/", ["open"], () => ({ status: "active" }));
     route.add("GET", "/users", ["open"], management.listUsers);

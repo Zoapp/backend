@@ -6,7 +6,6 @@
  */
 import ApiError from "zoauth-server/errors/ApiError";
 import AbstractController from "./abstractController";
-import UsersController from "./users";
 
 export default class extends AbstractController {
   constructor(name, main, className = null) {
@@ -15,7 +14,7 @@ export default class extends AbstractController {
   }
 
   async listUsers() {
-    return await this.usersController.getUsers();
+    return this.usersController.getUsers();
   }
 
   async createUser({ email, username, password, clientId, clientSecret }) {
@@ -27,6 +26,7 @@ export default class extends AbstractController {
         client_id: clientId,
       },
       clientId,
+      clientSecret,
     );
 
     if (resp === null) {
@@ -50,6 +50,5 @@ export default class extends AbstractController {
   async approveUser({ userId, clientId, clientSecret, scope = "owner" }) {
     const user = await this.main.getUser(userId);
     await this.main.authorize(user, clientId, clientSecret, "owner", scope);
-    return;
   }
 }

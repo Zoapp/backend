@@ -4,9 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import ApiError from "zoauth-server/errors/ApiError";
 import AbstractModel from "./abstractModel";
 import descriptor from "../schemas/users.json";
-import ApiError from "zoauth-server/errors/ApiError";
 
 export default class extends AbstractModel {
   constructor(database, config) {
@@ -31,14 +31,16 @@ export default class extends AbstractModel {
 
   async createProfile(user, profiles = this.getInnerTable("profiles")) {
     let profile = await profiles.getItem(`userId=${user.id}`);
-    //Also check for profiles with same userId or email.
-    let sameEmailProfile = await profiles.getItem(`email=${user.email}`);
-    let sameUsernameProfile = await profiles.getItem(`username=${user.username}`);
+    // Also check for profiles with same userId or email.
+    const sameEmailProfile = await profiles.getItem(`email=${user.email}`);
+    const sameUsernameProfile = await profiles.getItem(
+      `username=${user.username}`,
+    );
     if (sameEmailProfile) {
-      throw new ApiError(409, "Profile with same email already exists.")
+      throw new ApiError(409, "Profile with same email already exists.");
     }
     if (sameUsernameProfile) {
-      throw new ApiError(409, "Profile with same username already exists.")
+      throw new ApiError(409, "Profile with same username already exists.");
     }
     if (!user.id || !profile) {
       // Create a minimal profile from user's informations

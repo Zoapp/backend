@@ -21,7 +21,7 @@ export default class extends AbstractController {
     let profile = null;
     if (params.user && params.user.provider && !doNotCreate) {
       const self = this;
-      this.applyMiddleware("getUserProfile", params.user, async result => {
+      this.applyMiddleware("getUserProfile", params.user, async (result) => {
         profile = await self.model.storeProfile(result);
         // await self.dispatch("updateUserProfile", profile);
       });
@@ -51,11 +51,11 @@ export default class extends AbstractController {
   async getUsers(excludedUser) {
     let result = await this.main.authServer.getUsers();
     if (excludedUser) {
-      result = result.filter(user => user.id !== excludedUser.id);
+      result = result.filter((user) => user.id !== excludedUser.id);
     }
 
     return Promise.all(
-      result.map(async u => {
+      result.map(async (u) => {
         const user = { ...u };
         delete user.password;
 
@@ -66,7 +66,7 @@ export default class extends AbstractController {
         }
 
         return user;
-      })
+      }),
     );
   }
 
