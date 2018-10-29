@@ -6,6 +6,7 @@
  */
 import ApiError from "zoauth-server/errors/ApiError";
 import CommonRoutes from "./common";
+import deleteUndefined from "../utils/utilsObject";
 
 export default class extends CommonRoutes {
   constructor(controller) {
@@ -86,8 +87,8 @@ export default class extends CommonRoutes {
   async getMiddlewares(context) {
     const { origin } = context.getParams();
     const { type } = context.getQuery();
-    // logger.info("getMiddlewares", origin, type);
-    return this.controller.getMiddlewares().list(origin, type);
+    const options = deleteUndefined({ origin, type });
+    return this.controller.getMiddlewares().list(options);
   }
 
   async registerMiddleware(context) {

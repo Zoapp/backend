@@ -5,20 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 import localtunnel from "localtunnel";
+import AbstractPlugin from "../abstractPlugin";
 
-class LocalTunnel {
-  constructor(pluginManager) {
+class LocalTunnel extends AbstractPlugin {
+  constructor() {
+    super({ name: "localtunnel", type: "TunnelProvider" });
     this.tunnel = null;
     this.listener = null;
-    this.manager = pluginManager;
-    this.name = "localtunnel";
-    this.type = "TunnelProvider";
   }
 
+  // legacy
   getName() {
     return this.name;
   }
 
+  // legacy
   getType() {
     return this.type;
   }
@@ -34,7 +35,7 @@ class LocalTunnel {
     }
   }
 
-  async register(params) {
+  async onMiddlewareRegister(params) {
     // WIP
     const { port, ...options } = params;
     return new Promise((resolve, reject) => {
@@ -60,7 +61,7 @@ class LocalTunnel {
     });
   }
 
-  async unregister() {
+  async onMiddlewareUnregister() {
     return new Promise((resolve) => {
       if (this.tunnel) {
         this.tunnel.close();
@@ -68,13 +69,21 @@ class LocalTunnel {
       resolve();
     });
   }
+
+  getMiddlewareDefaultProperties() {
+    const mdp = super.getMiddlewareDefaultProperties();
+    return {
+      ...mdp,
+      status: "disabled",
+    };
+  }
 }
 
 let instance = null;
 
-const LocalTunnelPlugin = (pluginManager) => {
+const LocalTunnelPlugin = () => {
   if (!instance) {
-    instance = new LocalTunnel(pluginManager);
+    instance = new LocalTunnel();
   }
   return instance;
 };

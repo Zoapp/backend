@@ -9,6 +9,7 @@ import MiddlewaresController from "./middlewares";
 import AdminController from "./admin";
 import ManagementController from "./management";
 import Parameters from "../models/parameters";
+import PluginsController from "./pluginsController";
 
 /**
  * Class managing the controllers.
@@ -32,6 +33,7 @@ class MainController {
     this.middlewares = new MiddlewaresController("Middlewares", this, "system");
     this.admin = new AdminController("Admin", this);
     this.management = new ManagementController("Management", this);
+    this.pluginsController = new PluginsController("Plugins", this);
 
     this.parameters = new Parameters(this.database, this.config);
   }
@@ -144,8 +146,8 @@ class MainController {
     return this.middlewares;
   }
 
-  getPlugins() {
-    return this.plugins;
+  getPluginsController() {
+    return this.pluginsController;
   }
 }
 

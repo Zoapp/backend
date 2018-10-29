@@ -9,7 +9,6 @@ import zoauthServer, { AuthRouter } from "zoauth-server";
 import Controllers from "./controllers";
 import RouteBuilder from "./routes";
 import WSRouterBuilder from "./websocket";
-import PluginsManager from "./plugins";
 
 export class App {
   constructor(configuration, server = null) {
@@ -31,7 +30,6 @@ export class App {
     this.authRouter = AuthRouter(this.authServer);
 
     this.controllers = App.createMainControllers(this, this.configuration);
-    this.pluginsManager = PluginsManager(this, this.configuration);
     this.wsRouter = WSRouterBuilder(this);
     RouteBuilder(this);
 
@@ -155,8 +153,9 @@ export class App {
 
   addPlugins(plugins) {
     if (plugins) {
+      const pluginsController = this.controllers.getPluginsController();
       plugins.forEach((plugin) => {
-        this.pluginsManager.add(plugin);
+        pluginsController.add(plugin);
       });
     }
   }
