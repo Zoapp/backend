@@ -200,34 +200,6 @@ class PluginsController extends AbstractController {
     return middlewareController.removeById(middlewareId);
   }
 
-  // front
-  startPlugin(plugin) {
-    const name = plugin.getName();
-    this.plugins[name] = plugin;
-    if (plugin.start) {
-      plugin.start();
-    }
-  }
-
-  // front
-  instanciate(name, origin) {
-    const service = this.plugins[name];
-    let instance = null;
-    if (service.instanciate) {
-      instance = service.instanciate(origin);
-    } else {
-      instance = {};
-      instance.name = service.getName();
-      instance.title = service.getTitle();
-      instance.origin = origin;
-      instance.color = service.getColor();
-      instance.icon = service.getIcon();
-      instance.type = service.getType();
-    }
-    instance.status = "disabled";
-    return instance;
-  }
-
   /**
    * Register a middleware.
    * If there is a plugin with the same name has the middleware, it will call his onMiddlewareRegister(middleware) method.
