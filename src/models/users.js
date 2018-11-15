@@ -31,18 +31,19 @@ export default class extends AbstractModel {
 
   async createProfile(user, profiles = this.getInnerTable("profiles")) {
     let profile = await profiles.getItem(`userId=${user.id}`);
-    // Also check for profiles with same userId or email.
-    const sameEmailProfile = await profiles.getItem(`email=${user.email}`);
-    const sameUsernameProfile = await profiles.getItem(
-      `username=${user.username}`,
-    );
-    if (sameEmailProfile) {
-      throw new ApiError(409, "Profile with same email already exists.");
-    }
-    if (sameUsernameProfile) {
-      throw new ApiError(409, "Profile with same username already exists.");
-    }
+    // no profile with same userId
     if (!user.id || !profile) {
+      // Also check for profiles with same userId or email.
+      const sameEmailProfile = await profiles.getItem(`email=${user.email}`);
+      const sameUsernameProfile = await profiles.getItem(
+        `username=${user.username}`,
+      );
+      if (!user.anonymous && sameEmailProfile) {
+        throw new ApiError(409, "Profile with same email already exists.");
+      }
+      if (sameUsernameProfile) {
+        throw new ApiError(409, "Profile with same username already exists.");
+      }
       // Create a minimal profile from user's informations
       profile = {
         id: this.generateId(),
