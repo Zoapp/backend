@@ -64,29 +64,31 @@ describe("users - middlewares", () => {
         });
     });
 
-    // it("allow to create anonymous user without email", (done) => {
-    //   const newUser = {
-    //     username: "user",
-    //     email: undefined,
-    //   };
-    //   const preexistingUser = {
-    //     username: "foo",
-    //     email: undefined,
-    //   };
-    //   // when searching for email return a preexisting profile
-    //   const getItemSpy = jest.fn((arg) => {
-    //     if (arg.includes("email=")) {
-    //       return Promise.resolve(preexistingUser);
-    //     }
-    //     return Promise.resolve(undefined);
-    //   });
-    //   const setItemSpy = jest.fn().mockResolvedValue(Promise.resolve(newUser));
-    //   const profilesModelMock = { getItem: getItemSpy, setItem: setItemSpy };
-    //   usersModel.createProfile(newUser, profilesModelMock).then((result) => {
-    //     expect(setItemSpy).toHaveBeenCalled();
-    //     expect(result).toMatchObject(newUser);
-    //     done();
-    //   });
-    // });
+    it("allow to create anonymous user without email", (done) => {
+      const newUser = {
+        username: "user",
+        email: undefined,
+        anonymous: true,
+      };
+      const preexistingUser = {
+        username: "foo",
+        email: undefined,
+        anonymous: true,
+      };
+      // when searching for email return a preexisting profile
+      const getItemSpy = jest.fn((arg) => {
+        if (arg.includes("email=")) {
+          return Promise.resolve(preexistingUser);
+        }
+        return Promise.resolve(undefined);
+      });
+      const setItemSpy = jest.fn().mockResolvedValue(Promise.resolve(newUser));
+      const profilesModelMock = { getItem: getItemSpy, setItem: setItemSpy };
+      usersModel.createProfile(newUser, profilesModelMock).then((result) => {
+        expect(setItemSpy).toHaveBeenCalled();
+        expect(result).toMatchObject({ username: newUser.username });
+        done();
+      });
+    });
   });
 });
