@@ -221,7 +221,7 @@ class PluginsController extends AbstractController {
     // WIP
     const { name } = middleware;
     const plugin = this.get(name);
-    if (plugin) {
+    if (plugin && typeof plugin.onMiddlewareUnregister === "function") {
       return plugin.onMiddlewareUnregister(middleware);
     }
     return middleware;
