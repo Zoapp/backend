@@ -160,15 +160,18 @@ class PluginsController extends AbstractController {
       botId,
       includeCommon: true,
     });
-    const orgPlugins = this.getPlugins();
 
+    const orgPlugins = this.getPlugins();
     const pluginsResponse = orgPlugins.map((plugin) => {
-      const middleware = middlewares.find((md) => md.name === plugin.name);
+      const pluginMiddlewares = middlewares.filter(
+        (md) => md.name === plugin.name,
+      );
       return {
         ...plugin.properties,
-        middleware,
+        middlewares: pluginMiddlewares,
       };
     });
+
     return pluginsResponse;
   }
 
