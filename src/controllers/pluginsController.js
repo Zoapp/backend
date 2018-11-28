@@ -7,6 +7,7 @@
 // TODO remove import and use dynamic loading
 import LocalTunnelPlugin from "../plugins/localtunnel";
 import AbstractController from "./abstractController";
+import createSkeletonViewPlugin from "../plugins/skeleton-view";
 
 /**
  * PluginsController has two roles:
@@ -39,6 +40,7 @@ class PluginsController extends AbstractController {
     // TODO dynamic loading
     const plugin = LocalTunnelPlugin(this);
     this.add(plugin);
+    this.add(createSkeletonViewPlugin(this.main.zoapp));
   }
 
   add(plugin) {
