@@ -260,7 +260,7 @@ const commonDatasets = { password: "12345" };
           "/plugins",
           context.authUser1.access_token,
         );
-        expect(res).to.have.length(1);
+        expect(res).to.have.length(2);
         expect(res[0].name).to.equal("localtunnel");
         expect(res[0].type).to.equal("TunnelProvider");
       });
