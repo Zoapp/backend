@@ -5589,9 +5589,10 @@ zoapp-core@0.13.0:
     nodemailer "4.6.8"
     winston "2.4.0"
 
-zoauth-server@0.10.1:
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/zoauth-server/-/zoauth-server-0.10.1.tgz#f495f9b1b8f35df5e7addcd925b9e757b12f2cab"
+zoauth-server@0.10.2:
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/zoauth-server/-/zoauth-server-0.10.2.tgz#4dc0dcaebfb8b558bc7b30541dcfde9fbbc10266"
+  integrity sha512-rsgQtBjmFik5zf32Ke2DC32qGRQkkDs6DC3/csO5kLk36nFr+NkX4WZQPpy99krv76299kpj9d9/102aiRv+qQ==
   dependencies:
     body-parser "^1.17.2"
     express "^4.15.3"
