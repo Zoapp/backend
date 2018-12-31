@@ -23,6 +23,7 @@ export default class extends AbstractController {
         username,
         password,
         email,
+        accept: true, // hard coded to accept policy agreement not usefull on admin create user
         client_id: clientId,
       },
       clientId,

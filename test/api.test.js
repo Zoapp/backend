@@ -97,6 +97,7 @@ const initService = async (ctx, params, commons, envs) => {
     username: "user1",
     password: "12345",
     email: "user1@test.com",
+    accept: true,
   });
   context.user1 = r.result;
   r = await app.authServer.authorizeAccess({
