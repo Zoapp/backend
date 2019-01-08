@@ -69,8 +69,8 @@ class Users extends CommonRoutes {
   }
 
   async newProfile(context) {
-    this.todo = {};
-    return { todo: `users.newProfile route ${context.req.route.path}` };
+    const { userId } = context.getBody();
+    return this.controller.getUsers().createProfile(userId);
   }
 
   async updateProfile(context) {

@@ -70,6 +70,15 @@ export default class extends AbstractController {
     );
   }
 
+  async createProfile(userId) {
+    const user = await this.main.getUser(userId);
+    let profile;
+    if (user) {
+      profile = await this.model.createProfile(user);
+    }
+    return profile;
+  }
+
   async storeProfile(profile) {
     const p = await this.model.storeProfile(profile);
     // callback(p);
