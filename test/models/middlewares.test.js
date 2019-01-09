@@ -4,12 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { setupLogger } from "zoapp-core";
 import MiddlewaresModel from "../../src/models/middlewares";
 
 jest.mock("../../src/models/abstractModel");
-
-setupLogger("test");
 
 describe("models - middlewares", () => {
   let middlewaresModel = null;
