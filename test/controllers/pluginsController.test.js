@@ -4,11 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-// import chai from "chai";
-import { setupLogger } from "zoapp-core";
 import PluginsController from "../../src/controllers/pluginsController";
-
-setupLogger("test");
 
 describe("PluginsController", () => {
   const plugin1 = {

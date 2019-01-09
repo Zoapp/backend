@@ -4,13 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { setupLogger } from "zoapp-core";
 import ApiError from "zoauth-server/errors/ApiError";
 import UsersModel from "../../src/models/users";
 
 jest.mock("../../src/models/abstractModel");
-
-setupLogger("test");
 
 describe("users - middlewares", () => {
   let usersModel = null;

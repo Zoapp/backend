@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { setupLogger } from "zoapp-core";
-// eslint-disable-next-line
-import WSRouter, {WSRouter as WSRouterBase } from "../../src/websocket";
-
-setupLogger("test");
+// eslint-disable-next-line import/no-named-as-default
+import WSRouter, { WSRouter as WSRouterBase } from "../../src/websocket";
 
 describe("WSRouter", () => {
   describe("init middleware", () => {
