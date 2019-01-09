@@ -24,6 +24,7 @@ export default (zoapp) => {
   route.add("GET", "", ["open", "admin"], common.infos);
   // /me linked to /users/me route
   route.add("GET", "me", ["*", "admin", "master"], users.me);
+  route.add("PUT", "me", ["*", "admin", "master"], users.updateProfile);
 
   // /users routes
   route = zoapp.createRoute("/users");

@@ -79,6 +79,22 @@ export default class extends AbstractController {
     return profile;
   }
 
+  async updateProfile(profile) {
+    if (profile.userId) {
+      const user = await this.main.getUser(profile.userId);
+      // Double check in order to be sure that userId in profile match user token and found user
+      if (user) {
+        // Then update user
+        user.email = profile.email;
+        user.username = profile.username;
+        user.password = profile.password;
+        await this.main.authServer.model.setUser(user);
+      }
+    }
+    // And finally update profile
+    return this.storeProfile(profile);
+  }
+
   async storeProfile(profile) {
     const p = await this.model.storeProfile(profile);
     // callback(p);
