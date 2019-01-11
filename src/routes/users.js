@@ -78,8 +78,32 @@ class Users extends CommonRoutes {
   }
 
   async updateProfile(context) {
-    this.todo = {};
-    return { todo: `users.updateProfile route ${context.req.route.path}` };
+    let existingProfile = null;
+    const isAdmin = context.getScope() === "admin";
+    let { userId } = context.getParams();
+    let payload = {};
+    if (isAdmin && userId) {
+      // This is the /userId admin call. userId should be defined
+      existingProfile = await this.userProfile(context);
+    } else if (!userId) {
+      // This is the call for put /me. userId is not defined, so we use local context
+      userId = context.res.locals.access.user_id;
+      existingProfile = await this.me(context);
+    }
+    if (existingProfile && !existingProfile.error) {
+      const updatedProfile = context.getBody();
+      const result = await this.controller.getUsers().updateProfile({
+        ...updatedProfile,
+        userId,
+      });
+      payload = Users.profile(result);
+    } else {
+      payload = {
+        error: "Can't find user profile",
+        status: 400,
+      };
+    }
+    return payload;
   }
 
   async deleteProfile(context) {

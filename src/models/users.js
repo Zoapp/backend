@@ -64,6 +64,7 @@ export default class extends AbstractModel {
     if (p) {
       ({ id } = profile);
     }
-    await profiles.setItem(id, profile);
+    const i = await profiles.setItem(id, profile);
+    return profiles.getItem(i);
   }
 }

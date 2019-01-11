@@ -87,5 +87,31 @@ describe("users - middlewares", () => {
         done();
       });
     });
+    it("should update an existing profile", async () => {
+      // Not the best test case ever, since storeProfile mostly use getItem/setItem functions
+      const existingUser = {
+        id: "abcd",
+        username: "initial",
+        email: "initial@mail.com",
+      };
+      const updatedUser = {
+        id: "abcd",
+        username: "final",
+        email: "final@mail.com",
+      };
+      const getItemSpy = jest.fn((arg) => {
+        if (arg.includes("email=")) {
+          return Promise.resolve(existingUser);
+        }
+        return Promise.resolve(undefined);
+      });
+      const setItemSpy = jest
+        .fn()
+        .mockResolvedValue(Promise.resolve(updatedUser));
+      const profilesModelMock = { getItem: getItemSpy, setItem: setItemSpy };
+      expect(
+        usersModel.storeProfile(updatedUser, profilesModelMock),
+      ).resolves.toMatchObject(updatedUser);
+    });
   });
 });
