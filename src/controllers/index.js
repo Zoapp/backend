@@ -83,8 +83,8 @@ class MainController {
     return this.parameters;
   }
 
-  async signUp(user, clientId, clientSecret = null) {
-    return this.authServer.registerUser(user, clientId, clientSecret);
+  async signUp(user) {
+    return this.authServer.registerUser(user);
   }
 
   async authorize(user, clientId, clientSecret, scope, uniqueScope = null) {

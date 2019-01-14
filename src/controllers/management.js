@@ -17,18 +17,14 @@ export default class extends AbstractController {
     return this.usersController.getUsers();
   }
 
-  async createUser({ email, username, password, clientId, clientSecret }) {
-    const resp = await this.main.signUp(
-      {
-        username,
-        password,
-        email,
-        accept: true, // hard coded to accept policy agreement not usefull on admin create user
-        client_id: clientId,
-      },
-      clientId,
-      clientSecret,
-    );
+  async createUser({ email, username, password, clientId }) {
+    const resp = await this.main.signUp({
+      username,
+      password,
+      email,
+      accept: true, // hard coded to accept policy agreement not usefull on admin create user
+      client_id: clientId,
+    });
 
     if (resp === null) {
       throw new ApiError(500, "Can't create user");
