@@ -112,9 +112,6 @@ export default class extends AbstractController {
   async storeProfile(profile) {
     const p = await this.model.storeProfile(profile);
     // callback(p);
-    if (p.id) {
-      p.id = null;
-    }
     return p;
   }
 }
