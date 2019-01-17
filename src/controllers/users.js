@@ -6,6 +6,7 @@
  */
 import AbstractController from "./abstractController";
 import UsersModel from "../models/users";
+import Gravatar from "../utils/gravatar";
 
 export default class extends AbstractController {
   constructor(name, main) {
@@ -25,22 +26,16 @@ export default class extends AbstractController {
         profile = await self.model.storeProfile(result);
         // await self.dispatch("updateUserProfile", profile);
       });
-    } else if (params.user) {
+    } else if (params.user && !doNotCreate) {
       // make sure user.id is valid
-      const user = await this.main.getUser(params.user.id);
-      if (user && !doNotCreate) {
-        profile = await this.model.createProfile(user);
-      }
+      profile = await this.createProfile(params.user.id);
       // await this.dispatch("updateUserProfile", profile);
     }
 
     if (!profile && params.id) {
       profile = await this.model.getProfile(params.id);
       if (!profile && !doNotCreate) {
-        const user = await this.main.getUser(params.id);
-        if (user) {
-          profile = await this.model.createProfile(user);
-        }
+        profile = await this.createProfile(params.id);
       }
       // await this.dispatch("updateUserProfile", profile);
     }
@@ -71,28 +66,47 @@ export default class extends AbstractController {
   }
 
   async createProfile(userId) {
-    const user = await this.main.getUser(userId);
+    let user = await this.main.getUser(userId);
+    let avatar = "default";
     let profile;
     if (user) {
+      const gravatar = await Gravatar.fetchGravatar(user.email);
+      if (gravatar && gravatar.url) {
+        avatar = gravatar.url;
+      }
+      user = { ...user, avatar };
       profile = await this.model.createProfile(user);
     }
+
     return profile;
   }
 
   async updateProfile(profile) {
+    const updatedProfile = profile;
     if (profile.userId) {
-      const user = await this.main.getUser(profile.userId);
+      const user = await this.main.getUser(updatedProfile.userId);
       // Double check in order to be sure that userId in profile match user token and found user
       if (user) {
         // Then update user
-        user.email = profile.email;
-        user.username = profile.username;
-        user.password = profile.password;
+        if (user.email !== updatedProfile.email) {
+          updatedProfile.avatar = "reset";
+        }
+        user.email = updatedProfile.email;
+        user.username = updatedProfile.username;
+        user.password = updatedProfile.password;
         await this.main.authServer.model.setUser(user);
       }
     }
+    if (!updatedProfile.avatar || updatedProfile.avatar === "reset") {
+      const gravatar = await Gravatar.fetchGravatar(updatedProfile.email);
+      if (gravatar && gravatar.url) {
+        updatedProfile.avatar = gravatar.url;
+      } else {
+        updatedProfile.avatar = "default";
+      }
+    }
     // And finally update profile
-    return this.storeProfile(profile);
+    return this.storeProfile(updatedProfile);
   }
 
   async storeProfile(profile) {
