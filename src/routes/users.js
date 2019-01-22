@@ -94,6 +94,7 @@ class Users extends CommonRoutes {
       const updatedProfile = context.getBody();
       const result = await this.controller.getUsers().updateProfile({
         ...updatedProfile,
+        id: existingProfile.id,
         userId,
       });
       payload = Users.profile(result);
