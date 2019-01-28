@@ -15,39 +15,45 @@ export default class extends AbstractController {
   }
 
   async open() {
-    await super.open();
-    const backend = (await this.getMainParameters().getValue("backend")) || {};
-    // TODO remove tunnel init here and create a middleware dispatch for it
-    if (backend.tunnel) {
-      const tunnel = backend.tunnel.active;
-      if (tunnel && tunnel.provider) {
-        const cfg = this.main.config;
-        const { port } = cfg.global.api;
-        const params = {
-          port,
-          subdomain: tunnel.subdomain,
-          host: tunnel.host,
-          localhost: tunnel.localhost,
-        };
-        const url = await TunnelProvider.register(
-          this.zoapp.controllers.getPluginsController(),
-          tunnel.provider,
-          params,
-        );
-        if (url !== tunnel.url) {
-          logger.info("TunnelProvider url changed", url);
-          backend.tunnel.active.url = url;
-          backend.tunnel.active.subdomain = TunnelProvider.getActive(
+    try {
+      await super.open();
+      const backend =
+        (await this.getMainParameters().getValue("backend")) || {};
+      // TODO remove tunnel init here and create a middleware dispatch for it
+      if (backend.tunnel) {
+        const tunnel = backend.tunnel.active;
+        if (tunnel && tunnel.provider) {
+          const cfg = this.main.config;
+          const { port } = cfg.global.api;
+          const params = {
+            port,
+            subdomain: tunnel.subdomain,
+            host: tunnel.host,
+            localhost: tunnel.localhost,
+          };
+          const url = await TunnelProvider.register(
             this.zoapp.controllers.getPluginsController(),
-          ).subdomain;
-          await this.getMainParameters().setValue("backend", backend);
+            tunnel.provider,
+            params,
+          );
+          if (url !== tunnel.url) {
+            logger.info("TunnelProvider url changed", url);
+            backend.tunnel.active.url = url;
+            backend.tunnel.active.subdomain = TunnelProvider.getActive(
+              this.zoapp.controllers.getPluginsController(),
+            ).subdomain;
+            await this.getMainParameters().setValue("backend", backend);
+          }
         }
       }
-    }
-    // Init email service
-    const emailService = this.getEmailService();
-    if (emailService) {
-      await this.getEmailService().open();
+      // Init email service
+      const emailService = this.getEmailService();
+      const parameters = await this.getEmailParameters();
+      if (emailService && parameters) {
+        await emailService.open(parameters);
+      }
+    } catch (error) {
+      logger.error(error);
     }
   }
 
@@ -132,6 +138,8 @@ export default class extends AbstractController {
       parameters.emailServer = await this.getEmailParameters();
       if (!parameters.emailServer) {
         parameters.emailServer = {};
+      } else {
+        delete parameters.emailServer.auth.pass;
       }
     }
 
@@ -211,32 +219,23 @@ export default class extends AbstractController {
   }
 
   async configureMail(parameters) {
-    /* try {
-      await validate.async(parameters, emailConstraints);
-    } catch (error) {
-      throw new Error(error);
-    } */
-
+    let port = Number(parameters.port);
+    if (Number.isNaN(port)) {
+      port = null;
+    }
     const smtpConfig = {
       host: parameters.host,
-      port: parameters.port,
-      secure: true,
+      port,
+      secure: false, // change by true and do oauth2 connection
       auth: {
         user: parameters.username,
         pass: parameters.password,
       },
     };
-
-    /* const transporter = createTransport(smtpConfig);
-    try {
-      await transporter.verify();
-    } catch (error) {
-      throw new Error("can't configure SMTP");
-    } */
     try {
       await this.getEmailService().open(smtpConfig);
     } catch (error) {
-      throw new Error("can't configure SMTP");
+      throw new Error(error.message);
     }
 
     return this.setEmailParameters(smtpConfig);

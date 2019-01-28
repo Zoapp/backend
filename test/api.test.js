@@ -464,7 +464,7 @@ describe("API env variables", () => {
       })
       .then(() => done.fail("Should not get reached."))
       .catch((err) => {
-        expect(err.response).to.have.status(400);
+        expect(err.response).to.have.status(401);
       });
 
     const approveResp = await chai
