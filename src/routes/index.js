@@ -37,8 +37,8 @@ export default (zoapp) => {
 
   // /admin routes
   route = zoapp.createRoute("/admin");
-  route.add("GET", "", ["owner", "admin", "master"], admin.admin);
-  route.add("PUT", "", ["owner", "admin", "master"], admin.updateAdmin);
+  route.add("GET", "", ["admin"], admin.admin);
+  route.add("PUT", "", ["admin"], admin.updateAdmin);
   route.add("GET", "/setup", ["master"], admin.setup);
 
   // /middlewares routes

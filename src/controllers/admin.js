@@ -226,12 +226,16 @@ export default class extends AbstractController {
     const smtpConfig = {
       host: parameters.host,
       port,
-      secure: false, // change by true and do oauth2 connection
+      secure: true,
       auth: {
         user: parameters.username,
         pass: parameters.password,
       },
+      defaultParams: {
+        from: parameters.from,
+      },
     };
+
     try {
       await this.getEmailService().open(smtpConfig);
     } catch (error) {

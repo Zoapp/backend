@@ -51,7 +51,7 @@ export class App {
     return true;
   }
 
-  sendUserCreated(email, username, validationPolicy) {
+  async sendUserCreated(email, username, validationPolicy, validationParams) {
     let mailText = `Hi ${username} your account was created successfully.\n`;
     switch (validationPolicy) {
       case "admin":
@@ -59,8 +59,11 @@ export class App {
           "However, you should contact your administator to acctivate your account.";
         break;
       case "mail":
-        mailText +=
-          "To acctivate your account please click on following link.\nhttps://opla.ai";
+        mailText += `To acctivate your account please click on following link.\n${
+          this.configuration.global.auth_url
+        }validate?username=${username}&email=${email}&client_id=${
+          validationParams.client_id
+        }&validation_token=${validationParams.access_token}`;
         break;
       default:
         mailText += "Enjoy your chat bot experience !";
@@ -72,9 +75,8 @@ export class App {
         subject: "Opla account",
         text: mailText,
       };
-      this.emailService.sendMessage(mail);
+      await this.emailService.sendMessage(mail);
     }
-    return true;
   }
 
   get name() {
