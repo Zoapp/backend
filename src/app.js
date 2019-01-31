@@ -66,7 +66,7 @@ export class App {
         }&validation_token=${validationParams.access_token}`;
         break;
       default:
-        mailText += "Enjoy your chat bot experience !";
+        mailText += "Enjoy your chatbot experience !";
         break;
     }
     if (this.emailService && this.emailService.parameters) {
@@ -74,6 +74,17 @@ export class App {
         to: email,
         subject: "Opla account",
         text: mailText,
+      };
+      await this.emailService.sendMessage(mail);
+    }
+  }
+
+  async sendAccountEnable(email, username) {
+    if (this.emailService && this.emailService.parameters) {
+      const mail = {
+        to: email,
+        subject: "Opla account",
+        text: `Hi ${username}! Your account was enable by your administrator. Enjoy your chatbot builder experience.`,
       };
       await this.emailService.sendMessage(mail);
     }
