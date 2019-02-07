@@ -30,8 +30,8 @@
     "nodemailer": "^4.6.5",
     "validate.js": "^0.12.0",
     "ws": "^3.3.3",
-    "zoapp-core": "0.13.0",
-    "zoauth-server": "0.10.5"
+    "zoapp-core": "0.13.1",
+    "zoauth-server": "0.10.9"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

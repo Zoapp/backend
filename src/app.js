@@ -29,11 +29,11 @@ export class App {
     this.authServer = App.zoauthServer(authConfig, server.app, this);
     this.authRouter = AuthRouter(this.authServer);
 
+    this.emailService = new EmailService();
+
     this.controllers = App.createMainControllers(this, this.configuration);
     this.wsRouter = WSRouterBuilder(this);
     RouteBuilder(this);
-
-    this.emailService = new EmailService();
   }
 
   sendChangedPassword(email) {
@@ -51,14 +51,43 @@ export class App {
     return true;
   }
 
-  sendUserCreated(email, username, validationPolicy) {
-    if (this.emailService) {
-      // TODO
+  async sendUserCreated(email, username, validationPolicy, validationParams) {
+    let mailText = `Hi ${username} your account was created successfully.\n`;
+    switch (validationPolicy) {
+      case "admin":
+        mailText +=
+          "However, you should contact your administator to acctivate your account.";
+        break;
+      case "mail":
+        mailText += `To acctivate your account please click on following link.\n${
+          this.configuration.global.auth_url
+        }validate?username=${username}&email=${email}&client_id=${
+          validationParams.client_id
+        }&validation_token=${validationParams.access_token}`;
+        break;
+      default:
+        mailText += "Enjoy your chatbot experience !";
+        break;
     }
-    logger.info(
-      `TODO sendUserCreated ${email} ${username} ${validationPolicy}`,
-    );
-    return true;
+    if (this.emailService && this.emailService.parameters) {
+      const mail = {
+        to: email,
+        subject: "Opla account",
+        text: mailText,
+      };
+      await this.emailService.sendMessage(mail);
+    }
+  }
+
+  async sendAccountEnable(email, username) {
+    if (this.emailService && this.emailService.parameters) {
+      const mail = {
+        to: email,
+        subject: "Opla account",
+        text: `Hi ${username}! Your account was enable by your administrator. Enjoy your chatbot builder experience.`,
+      };
+      await this.emailService.sendMessage(mail);
+    }
   }
 
   get name() {
@@ -76,8 +105,8 @@ export class App {
   /**
    * Private proxy function between App.constructor and zoauth-server. Make unit tests easier.
    */
-  static zoauthServer(authConfig, serverApp) {
-    return zoauthServer(authConfig, serverApp);
+  static zoauthServer(authConfig, serverApp, middleware) {
+    return zoauthServer(authConfig, serverApp, middleware);
   }
 
   /**

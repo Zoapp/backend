@@ -4,7 +4,7 @@
  * This source code is licensed under the GPL v2.0+ license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import ApiError from "zoauth-server/errors/ApiError";
+import { ApiError } from "zoauth-server/errors";
 import AbstractController from "./abstractController";
 
 export default class extends AbstractController {
