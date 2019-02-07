@@ -215,7 +215,7 @@ export default class extends AbstractController {
     } else if (parameters.emailServer) {
       await this.configureMail(parameters.emailServer);
     }
-    return this.getParameters(user, clientId, true);
+    return this.getParameters(user, clientId, "admin");
   }
 
   async configureMail(parameters) {
