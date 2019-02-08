@@ -1,6 +1,6 @@
 {
   "name": "zoapp-backend",
-  "version": "0.24.6",
+  "version": "0.24.7",
   "description": "Zoapp Backend",
   "main": "index.js",
   "author": "Mik BRY <mik@zoapp.com>",
