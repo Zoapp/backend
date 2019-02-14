@@ -67,6 +67,7 @@ export default class extends CommonRoutes {
   async getParameterValue(context) {
     const { name, type } = context.getParams();
     const value = await this.controller
+      .getAdmin()
       .getMainParameters()
       .getValue(name, type);
     if (type) {
