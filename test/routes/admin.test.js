@@ -12,39 +12,30 @@ const { expect } = chai;
 
 describe("admin", () => {
   describe("getParameterValue", () => {
-    it("return value found in database", async () => {
-      const context = {
-        getParams: () => ({ name: "foo" }),
-      };
+    const context = {
+      getParams: () => ({ name: "foo" }),
+    };
 
-      const parameters = {
-        getValue: async (name) => name,
-      };
+    const parameters = {
+      getValue: async (name) => name,
+    };
 
-      const controller = {
+    const controller = {
+      getAdmin: () => ({
         getMainParameters: () => parameters,
-      };
+      }),
+    };
 
-      const admin = new Admin(controller);
+    const admin = new Admin(controller);
+
+    it("return value found in database", async () => {
       const result = await admin.getParameterValue(context);
 
       expect(result).to.equal("foo");
     });
 
     it("throws an ApiError if nothing is found", async () => {
-      const context = {
-        getParams: () => ({ name: "foo" }),
-      };
-
-      const parameters = {
-        getValue: async () => null,
-      };
-
-      const controller = {
-        getMainParameters: () => parameters,
-      };
-
-      const admin = new Admin(controller);
+      parameters.getValue = async () => null;
       try {
         await admin.getParameterValue(context);
         throw new Error("an error should be return before");
