@@ -36,19 +36,28 @@ export class App {
     RouteBuilder(this);
   }
 
-  sendChangedPassword(email) {
-    if (this.emailService) {
-      // TODO
+  async sendChangedPassword(email, username) {
+    if (this.emailService && this.emailService.parameters) {
+      const mail = {
+        to: email,
+        subject: "Opla password changed",
+        text: `Hi ${username}, your password was successfully changed, please login to enjoy your chatbot builder experience`,
+      };
+      await this.emailService.sendMessage(mail);
     }
-    logger.info(`TODO sendChangedPassword ${email}`);
   }
 
-  sendResetPassword(email) {
-    if (this.emailService) {
-      // TODO
+  async sendResetPassword(email, username, params) {
+    if (this.emailService && this.emailService.parameters) {
+      const mail = {
+        to: email,
+        subject: "Lost your Opla password ?",
+        text: `Hi ${username}, you asked to reset your Opla account password. Please follow the link below to do that\n${
+          params.redirectUri
+        }/lost-password?reset_token=${params.accessToken}`,
+      };
+      await this.emailService.sendMessage(mail);
     }
-    logger.info(`TODO sendResetPassword ${email}`);
-    return true;
   }
 
   async sendUserCreated(email, username, validationPolicy, validationParams) {
