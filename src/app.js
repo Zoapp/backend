@@ -52,9 +52,7 @@ export class App {
       const mail = {
         to: email,
         subject: "Lost your Opla password ?",
-        text: `Hi ${username}, you asked to reset your Opla account password. Please follow the link below to do that\n${
-          params.redirectUri
-        }/lost-password?reset_token=${params.accessToken}`,
+        text: `Hi ${username}, you asked to reset your Opla account password. Please follow the link below to do that\n${params.redirectUri}/lost-password?reset_token=${params.accessToken}`,
       };
       await this.emailService.sendMessage(mail);
     }
@@ -68,11 +66,7 @@ export class App {
           "However, you should contact your administator to acctivate your account.";
         break;
       case "mail":
-        mailText += `To acctivate your account please click on following link.\n${
-          this.configuration.global.auth_url
-        }validate?username=${username}&email=${email}&client_id=${
-          validationParams.client_id
-        }&validation_token=${validationParams.access_token}`;
+        mailText += `To acctivate your account please click on following link.\n${this.configuration.global.auth_url}validate?username=${username}&email=${email}&client_id=${validationParams.client_id}&validation_token=${validationParams.access_token}`;
         break;
       default:
         mailText += "Enjoy your chatbot experience !";
@@ -166,9 +160,7 @@ export class App {
       appConfiguration.global.api.endpoint &&
       appConfiguration.global.api.version
     ) {
-      endpoint = `${appConfiguration.global.api.endpoint}/v${
-        appConfiguration.global.api.version
-      }`;
+      endpoint = `${appConfiguration.global.api.endpoint}/v${appConfiguration.global.api.version}`;
     } else {
       throw new Error(
         "ConfigurationError: global api endpoint configuration not found",
