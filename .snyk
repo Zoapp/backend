@@ -1,5 +1,6 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.14.1
+version: v1.19.0
+
 ignore: {}
 # patches apply the minimum changes required to fix a vulnerability
 patch:
@@ -7,5 +8,39 @@ patch:
     - lodash:
         patched: '2019-07-04T08:53:18.873Z'
   SNYK-JS-LODASH-567746:
-    - lodash:
-        patched: '2020-05-01T08:51:11.476Z'
+    - snyk > inquirer > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > snyk-nuget-plugin > dotnet-deps-parser > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > @snyk/dep-graph > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > snyk-config > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > snyk-mvn-plugin > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > snyk-nodejs-lockfile-parser > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > snyk-nuget-plugin > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > snyk-go-plugin > graphlib > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > snyk-nodejs-lockfile-parser > graphlib > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > @snyk/snyk-cocoapods-plugin > @snyk/dep-graph > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > snyk-php-plugin > @snyk/composer-lockfile-parser > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > @snyk/snyk-cocoapods-plugin > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > @snyk/snyk-cocoapods-plugin > @snyk/cocoapods-lockfile-parser > @snyk/ruby-semver > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+    - snyk > @snyk/snyk-cocoapods-plugin > @snyk/cocoapods-lockfile-parser > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-08-10T08:53:50.706Z'
+  SNYK-JS-TREEKILL-536781:
+    - snyk > snyk-sbt-plugin > tree-kill:
+        patched: '2020-08-10T08:53:50.706Z'
+
