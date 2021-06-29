@@ -29,7 +29,7 @@
     "localtunnel": "2.0.1",
     "lodash": "^4.17.20",
     "node-fetch": "^2.1.2",
-    "nodemailer": "^6.4.16",
+    "nodemailer": "^6.6.1",
     "validate.js": "^0.12.0",
     "ws": "^7.4.6",
     "zoapp-core": "0.13.1",
