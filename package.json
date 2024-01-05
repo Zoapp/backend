@@ -34,7 +34,7 @@
     "ws": "^7.4.6",
     "zoapp-core": "0.13.1",
     "zoauth-server": "0.10.11",
-    "snyk": "^1.518.0"
+    "snyk": "^1.996.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
